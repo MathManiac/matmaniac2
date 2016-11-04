@@ -2,7 +2,7 @@
 
 namespace App\Opgaver\Algebra;
 
-class Substraction
+class Subtraction
 {
     public $a;
     public $b;

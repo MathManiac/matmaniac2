@@ -31,11 +31,19 @@ class HomeController extends Controller
 
     public function formelSamling()
     {
+        $a = rand(10, 11);
+        $b = rand(1, 11);
+        $c = rand(1, 11);
+        $opg = "f(x) = $a x^2+$b x-$c ";
+        $opg1 = "{$c}\\over{$a}";
+        $opg2 = "\\sqrt{{$a}\\cdot{$c}}";
 
-        return view('formel-samling');
+        $question = "1,$a,$b,$c";
+        $hash = md5($opg . 'mm');
+        return view('formel-samling', compact('opg', 'opg1', 'opg2', 'hash', 'question'));
     }
 
-    public function opgaver($type, $subtype)
+    public function valgtOpgave($type, $subtype, Handler $mathHandler)
     {
         if ( ! session()->exists('result-set'))
         {
@@ -45,13 +53,14 @@ class HomeController extends Controller
             $resultSet->save();
             session()->put('result-set', $resultSet);
         }
+        $question = $mathHandler->getQuestion($subtype);
 
-        $a = rand(1, 11);
-        $b = rand(1, 11);
-        $opg = "$a + $b";
-        $question = "1,$a,$b";
-        $hash = md5($opg . 'mm');
-        return view('opgaver', compact('opg', 'hash', 'question'));
+        $opg = $question['question'];
+        $q = [];
+        $q[] = $subtype;
+        $q = implode(array_merge($q, $question['numbers']));
+        $hash = md5($q . 'mm');
+        return view('opgaver.valgt', compact('opg', 'hash', 'q'));
     }
 
     public function tjekResultat(Handler $mathHandler)
@@ -66,5 +75,10 @@ class HomeController extends Controller
             $question->save();
         }
 
+    }
+
+    public function opgaver()
+    {
+        return view('opgaver.home');
     }
 }

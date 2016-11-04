@@ -17,12 +17,17 @@ Route::get('/', function () {
 
 Route::get('formel-samling', [
     'uses' => 'HomeController@formelSamling',
-    'as'   => 'formel-samling'
+    'as' => 'formel-samling'
 ]);
 
-Route::get('{type}/{subtype}/opgaver', [
-    'uses' => 'HomeController@opgaver',
-    'as'   => 'opgaver'
+Route::get('opgaver/{type?}', [
+    'as' => 'opgaver',
+    'uses' => 'HomeController@opgaver'
+]);
+
+Route::get('opgaver/{type}/{subtype}', [
+    'uses' => 'HomeController@valgtOpgave',
+    'as' => 'valgtOpgave'
 ]);
 
 Route::post('tjek-resultat', [
