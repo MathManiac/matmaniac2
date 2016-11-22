@@ -2,25 +2,21 @@
 
 namespace App\Opgaver;
 
+use App\Opgaver\Equations\XOnOneSide;
 use App\Opgaver\Fractions\MultiplyTwoFracs;
 
 class Handler
 {
     public $types = [
-        10 => MultiplyTwoFracs::class,
-        11 => OneFrac::class
+        20 => MultiplyTwoFracs::class,
+        21 => OneFrac::class,
+        40 => XOnOneSide::class
     ];
 
     public function sendToCorrection($question, $resultat)
     {
-        $arguments = explode(',', $question);
-        $input = $arguments;
-        unset($input[0]);
-        $input = array_values($input);
-        $result = null;
-
-        $instance = new $this->types[$arguments[0]];
-        return $instance->validateQuestion($input, $resultat);
+        $instance = new $this->types[$question['subType']];
+        return $instance->validateQuestion($resultat, $question);
     }
 
     public function getQuestion($subExerciseId)

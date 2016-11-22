@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Opgaver\Handler;
 use App\Question;
 use App\ResultSet;
+use App\SubExerciseType;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -43,38 +44,70 @@ class HomeController extends Controller
         return view('formel-samling', compact('opg', 'opg1', 'opg2', 'hash', 'question'));
     }
 
+    public function startOpgave($type, $subtype)
+    {
+        #if(session()->exists('result-set'))
+        #return
+        $resultSet = new ResultSet();
+        $resultSet->user_id = auth()->id();
+        $resultSet->sub_exercise_type_id = $subtype;
+        $resultSet->save();
+        session()->put('result-set', $resultSet);
+        return redirect()->route('valgtOpgave', [$type, $subtype]);
+    }
+
+    public function slutOpgave($type, $subtype)
+    {
+        $resultSet = session('result-set');
+        $resultSet->ended_at = date('Y-m-d H:i:s');
+        $resultSet->save();
+        session()->forget('result-set');
+        session()->forget('question');
+        return redirect()->route('opgaver');
+    }
+
     public function valgtOpgave($type, $subtype, Handler $mathHandler)
     {
-        if ( ! session()->exists('result-set'))
-        {
-            $resultSet = new ResultSet();
-            $resultSet->user_id = auth()->id();
-            $resultSet->sub_exercise_type_id = $subtype;
-            $resultSet->save();
-            session()->put('result-set', $resultSet);
+        if ( ! session()->has('question')) {
+            $question = $mathHandler->getQuestion($subtype);
+            session()->put('question', $question);
+            session()->put('question.subType',$subtype);
         }
-        $question = $mathHandler->getQuestion($subtype);
-
+        else
+            $question = session('question');
         $opg = $question['question'];
-        $q = [];
-        $q[] = $subtype;
-        $q = implode(array_merge($q, $question['numbers']));
-        $hash = md5($q . 'mm');
-        return view('opgaver.valgt', compact('opg', 'hash', 'q'));
+        return view('opgaver.valgt', compact('opg', 'type', 'subtype'));
     }
 
     public function tjekResultat(Handler $mathHandler)
     {
-        $q = request('question');
-        if ($mathHandler->sendToCorrection($q, request('resultat')))
+        $question = session('question');
+        $subType = SubExerciseType::find($question['subType']);
+        $response = request('resultat');
+        if( ! session()->has('question.instance'))
         {
-            $question = new Question();
-            $question->result_set_id = session('result-set')->id;
-            $question->tries = 0;
-            $question->question = $q;
-            $question->save();
+            $q = new Question();
+            $q->result_set_id = session('result-set')->id;
+            $q->tries = 0;
+            $q->question = $question['question'];
+            $q->save();
+            session()->put('question.instance', $q);
         }
-
+        else
+            $q = session('question.instance');
+        if ($mathHandler->sendToCorrection($question, $response))
+        {
+            $q->input = $response;
+            $q->save();
+            session()->forget('question');
+        }
+        else
+        {
+            $q->tries = $q->tries + 1;
+            $q->save();
+            return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathError('incorrectAnswer');
+        }
+        return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathSolution('correctAnswer');
     }
 
     public function opgaver()

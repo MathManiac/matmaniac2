@@ -20,15 +20,29 @@ Route::get('formel-samling', [
     'as' => 'formel-samling'
 ]);
 
-Route::get('opgaver/{type?}', [
-    'as' => 'opgaver',
-    'uses' => 'HomeController@opgaver'
-]);
+Route::group(['prefix' => 'opgaver'], function () {
 
-Route::get('opgaver/{type}/{subtype}', [
-    'uses' => 'HomeController@valgtOpgave',
-    'as' => 'valgtOpgave'
-]);
+    Route::get('{type?}', [
+        'as' => 'opgaver',
+        'uses' => 'HomeController@opgaver'
+    ]);
+
+    Route::get('{type}/{subtype}', [
+        'uses' => 'HomeController@valgtOpgave',
+        'as' => 'valgtOpgave'
+    ]);
+
+    Route::get('{type}/{subtype}/start', [
+        'uses' => 'HomeController@startOpgave',
+        'as' => 'startResultSet'
+    ]);
+
+    Route::get('{type}/{subtype}/end', [
+        'uses' => 'HomeController@slutOpgave',
+        'as' => 'endResultSet'
+    ]);
+});
+
 
 Route::post('tjek-resultat', [
     'uses' => 'HomeController@tjekResultat',
@@ -38,3 +52,5 @@ Route::post('tjek-resultat', [
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+//Route til billeder

@@ -3,7 +3,7 @@
 return [
     'exercises' => [
         'algebra' => 'Algebra',
-        'fractions' => 'Brøker',
+        'fractions' => 'Fractions',
     ],
     'subExercises' => [
         'addition' => 'Addition',

@@ -17,6 +17,7 @@ class CreateResultSetsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('sub_exercise_type_id');
+            $table->dateTime('ended_at')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

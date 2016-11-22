@@ -7,12 +7,12 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div align="center">
-                        <h1>Velkommen</h1>
+                        <h1>Velkommen til {{ isset(Auth::user()->name) ? Auth::user()->name : Auth::user()->email }}</h1>
                     </div>
                 </div>
 
                 <div class="panel-body">
-                    Du er logget ind!
+                    HER SKAL STÅ ET ELLER ANDET EVT ET BILLEDE
                 </div>
             </div>
         </div>

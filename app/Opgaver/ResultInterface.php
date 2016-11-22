@@ -4,5 +4,5 @@ namespace App\Opgaver;
 
 interface ResultInterface
 {
-    public function validateResult($input, $result);
+    public function validateQuestion($input, $question);
 }
