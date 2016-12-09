@@ -68,46 +68,51 @@ class HomeController extends Controller
 
     public function valgtOpgave($type, $subtype, Handler $mathHandler)
     {
-        if ( ! session()->has('question')) {
-            $question = $mathHandler->getQuestion($subtype);
-            session()->put('question', $question);
-            session()->put('question.subType',$subtype);
+        if (session()->has('result-set')) {
+            if (session('result-set')->sub_exercise_type_id != $subtype)
+                return view('opgaver.ongoing');
+            if (!session()->has('question')) {
+                $question = $mathHandler->getQuestion($subtype);
+                session()->put('question', $question);
+                session()->put('question.subType', $subtype);
+            } else
+                $question = session('question');
+            $opg = $question['question.value'];
         }
-        else
-            $question = session('question');
-        $opg = $question['question'];
         return view('opgaver.valgt', compact('opg', 'type', 'subtype'));
     }
 
     public function tjekResultat(Handler $mathHandler)
     {
         $question = session('question');
-        $subType = SubExerciseType::find($question['subType']);
-        $response = request('resultat');
+        $response = request('result');
+
         if( ! session()->has('question.instance'))
         {
             $q = new Question();
             $q->result_set_id = session('result-set')->id;
             $q->tries = 0;
-            $q->question = $question['question'];
+            $q->question = $question['question.value'];
             $q->save();
             session()->put('question.instance', $q);
         }
         else
             $q = session('question.instance');
+        $q->tries = $q->tries + 1;
         if ($mathHandler->sendToCorrection($question, $response))
         {
             $q->input = $response;
             $q->save();
             session()->forget('question');
+            return ['response' => true];
         }
         else
         {
-            $q->tries = $q->tries + 1;
             $q->save();
-            return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathError('incorrectAnswer');
+            return ['response' => false];
+            //return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathError('incorrectAnswer');
         }
-        return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathSolution('correctAnswer');
+        //return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathSolution('correctAnswer');
     }
 
     public function opgaver()

@@ -45,5 +45,10 @@ class ExercisesSeeder extends Seeder
             'id' => 40,
             'name' => 'equation-x-on-one-side'
         ]);
+
+        $exercise->subExercises()->create([
+            'id' => 41,
+            'name' => 'equation-x-on-both-sides'
+        ]);
     }
 }

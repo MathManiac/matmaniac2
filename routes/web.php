@@ -41,6 +41,11 @@ Route::group(['prefix' => 'opgaver'], function () {
         'uses' => 'HomeController@slutOpgave',
         'as' => 'endResultSet'
     ]);
+
+    Route::get('{type}/{subtype}/skip-question', [
+        'uses' => 'TaskController@skipQuestion',
+        'as' => 'skip-opgave'
+    ]);
 });
 
 
