@@ -15,23 +15,28 @@ class XOnOneSide implements QuestionInterface, ResultInterface
        // $c = rand(1,15);
        // $d = rand(1,15);
         $i = rand(1,2);
-        if ($i == 1) {
-            return [
-                'question' => "x + $a = $b",
-                'numbers' => [$a, $b],
-                'type' => $i
-            ];
-        } elseif ($i == 2) {
-            return [
-                'question' => "x - $a = $b",
-                'numbers' => [$a, $b],
-                'type' => $i
-            ];
+        $question = [];
+        switch ($i)
+        {
+            case 1:
+                $question = [
+                    'question.value' => "x + $a = $b",
+                    'question.numbers' => [$a, $b]
+                ];
+                break;
+            case 2:
+                $question = [
+                    'question.value' => "x - $a = $b",
+                    'question.numbers' => [$a, $b]
+                ];
+                break;
         }
+        $question['question.type'] = $i;
         /*return [
             'question' => "x + $a = $b",
             'numbers' => [$a, $b]
         ];*/
+        return $question;
     }
 
     public function validateQuestion($input, $question)

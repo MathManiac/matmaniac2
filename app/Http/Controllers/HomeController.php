@@ -8,8 +8,8 @@ use App\ResultSet;
 use App\SubExerciseType;
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
-{
+class HomeController extends Controller {
+
     /**
      * Create a new controller instance.
      *
@@ -41,6 +41,7 @@ class HomeController extends Controller
 
         $question = "1,$a,$b,$c";
         $hash = md5($opg . 'mm');
+
         return view('formel-samling', compact('opg', 'opg1', 'opg2', 'hash', 'question'));
     }
 
@@ -53,6 +54,7 @@ class HomeController extends Controller
         $resultSet->sub_exercise_type_id = $subtype;
         $resultSet->save();
         session()->put('result-set', $resultSet);
+
         return redirect()->route('valgtOpgave', [$type, $subtype]);
     }
 
@@ -63,15 +65,18 @@ class HomeController extends Controller
         $resultSet->save();
         session()->forget('result-set');
         session()->forget('question');
+
         return redirect()->route('opgaver');
     }
 
     public function valgtOpgave($type, $subtype, Handler $mathHandler)
     {
-        if (session()->has('result-set')) {
+        if (session()->has('result-set'))
+        {
             if (session('result-set')->sub_exercise_type_id != $subtype)
                 return view('opgaver.ongoing');
-            if (!session()->has('question')) {
+            if ( ! session()->has('question'))
+            {
                 $question = $mathHandler->getQuestion($subtype);
                 session()->put('question', $question);
                 session()->put('question.subType', $subtype);
@@ -79,6 +84,7 @@ class HomeController extends Controller
                 $question = session('question');
             $opg = $question['question.value'];
         }
+
         return view('opgaver.valgt', compact('opg', 'type', 'subtype'));
     }
 
@@ -87,7 +93,7 @@ class HomeController extends Controller
         $question = session('question');
         $response = request('result');
 
-        if( ! session()->has('question.instance'))
+        if ( ! session()->has('question.instance'))
         {
             $q = new Question();
             $q->result_set_id = session('result-set')->id;
@@ -95,8 +101,7 @@ class HomeController extends Controller
             $q->question = $question['question.value'];
             $q->save();
             session()->put('question.instance', $q);
-        }
-        else
+        } else
             $q = session('question.instance');
         $q->tries = $q->tries + 1;
         if ($mathHandler->sendToCorrection($question, $response))
@@ -104,11 +109,12 @@ class HomeController extends Controller
             $q->input = $response;
             $q->save();
             session()->forget('question');
+
             return ['response' => true];
-        }
-        else
+        } else
         {
             $q->save();
+
             return ['response' => false];
             //return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathError('incorrectAnswer');
         }
