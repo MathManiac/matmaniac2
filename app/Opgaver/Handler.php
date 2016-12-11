@@ -23,7 +23,7 @@ class Handler
 
     public function getQuestion($subExerciseId)
     {
-        $instance = new $this->types[$subExerciseId];
+        $instance = new $this->types[$subExerciseId->id];
         return $instance->Ask();
     }
 }

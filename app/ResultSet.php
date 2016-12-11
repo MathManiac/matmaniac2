@@ -10,4 +10,9 @@ class ResultSet extends Model
     {
         return $this->hasMany(Question::class);
     }
+
+    public function subExerciseType()
+    {
+        return $this->belongsTo(SubExerciseType::class);
+    }
 }

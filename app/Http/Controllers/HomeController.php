@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ExerciseType;
 use App\Opgaver\Handler;
 use App\Question;
 use App\ResultSet;
@@ -47,8 +48,6 @@ class HomeController extends Controller {
 
     public function startOpgave($type, $subtype)
     {
-        #if(session()->exists('result-set'))
-        #return
         $resultSet = new ResultSet();
         $resultSet->user_id = auth()->id();
         $resultSet->sub_exercise_type_id = $subtype;
@@ -66,15 +65,15 @@ class HomeController extends Controller {
         session()->forget('result-set');
         session()->forget('question');
 
-        return redirect()->route('opgaver');
+        return redirect()->route('opgaver')->withSuccess('Opgaven blev afsluttet.');
     }
 
-    public function valgtOpgave($type, $subtype, Handler $mathHandler)
+    public function valgtOpgave(ExerciseType $type, SubExerciseType $subtype, Handler $mathHandler)
     {
         if (session()->has('result-set'))
         {
-            if (session('result-set')->sub_exercise_type_id != $subtype)
-                return view('opgaver.ongoing');
+            if (session('result-set')->sub_exercise_type_id != $subtype->id)
+                return view('opgaver.ongoing', compact('subtype'));
             if ( ! session()->has('question'))
             {
                 $question = $mathHandler->getQuestion($subtype);
@@ -111,18 +110,16 @@ class HomeController extends Controller {
             session()->forget('question');
 
             return ['response' => true];
-        } else
+        }
+        else
         {
             $q->save();
-
             return ['response' => false];
-            //return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathError('incorrectAnswer');
         }
-        //return redirect()->route('valgtOpgave', [$subType->exercise_type_id, $subType->id])->withMathSolution('correctAnswer');
     }
 
-    public function opgaver()
+    public function opgaver(ExerciseType $type)
     {
-        return view('opgaver.home');
+        return view('opgaver.home', compact('type'));
     }
 }

@@ -1,7 +1,7 @@
 @extends('opgaver.master')
 
 @section('opgaveContent')
-
+    <!--<h1>{{ trans('tasks.subExercises.'.$subtype->name) }}</h1>-->
     @include('opgaver.partials.status-bar', compact('type', 'subtype'))
     <p>Klik på 'Ny opgave' når du vil i gang. Hvis opgaven er for svær kan du springe den over,
         når den er løst korrekt kommer der automatisk en ny opgave. Klik på 'Afslut' når du vl stoppe.</p>
