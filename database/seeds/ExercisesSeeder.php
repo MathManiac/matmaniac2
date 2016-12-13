@@ -60,5 +60,20 @@ class ExercisesSeeder extends Seeder
             'id' => 43,
             'name' => 'equation-x-in-nominator'
         ]);
+
+        $exercise = \App\ExerciseType::create([
+            'id' => 4,
+            'name' => 'functions',
+        ]);
+
+        $exercise->subExercises()->create([
+            'id' => 60,
+            'name' => 'two-points-exponential'
+        ]);
+
+        $exercise->subExercises()->create([
+            'id' => 61,
+            'name' => 'second-poly'
+        ]);
     }
 }

@@ -10,17 +10,17 @@ class XOnBothSides implements QuestionInterface, ResultInterface
 
     public function Ask()
     {
-        $a = rand(2,15);
-        $b = rand(2,15);
-        $c = rand(1,5);
-        $d = rand(6,11);
-        $i = rand(1,4);
+        $a = rand(2, 15);
+        $b = rand(2, 15);
+        $c = rand(1, 5);
+        $d = rand(6, 11);
+        $i = rand(1, 4);
         $question = [];
         switch ($i) {
             case 1:
                 $question = [
                     'question.value' => "$c x + $a = $b + $d x",
-                    'question.numbers' => [$a, $b, $c, $d]
+                    'question.numbers' => [$a, $b, $c, $d],
                 ];
                 break;
             case 2:
@@ -43,6 +43,14 @@ class XOnBothSides implements QuestionInterface, ResultInterface
                 break;
         }
         $question['question.type'] = $i;
+        $question['input'] = [
+            'a' => [
+                'title' => 'A',
+            ],
+            'b' => [
+                'title' => 'B'
+            ]
+        ];
         return $question;
     }
 
@@ -55,7 +63,7 @@ class XOnBothSides implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round(($b - $a)/($c - $d), 2);
+                $res = round(($b - $a) / ($c - $d), 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -64,7 +72,7 @@ class XOnBothSides implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round(($b+$a)/($d - $c),2);
+                $res = round(($b + $a) / ($d - $c), 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -73,7 +81,7 @@ class XOnBothSides implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round(($b - $a)/($c + $d), 2);
+                $res = round(($b - $a) / ($c + $d), 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -82,7 +90,7 @@ class XOnBothSides implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round(($b+$a)/($d + $c),2);
+                $res = round(($b + $a) / ($d + $c), 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);

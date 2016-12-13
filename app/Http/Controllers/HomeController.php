@@ -81,41 +81,39 @@ class HomeController extends Controller {
                 session()->put('question.subType', $subtype);
             } else
                 $question = session('question');
-            $opg = $question['question.value'];
+            $opg = $question['value'];
+            $input = $question['input'];
         }
 
-        return view('opgaver.valgt', compact('opg', 'type', 'subtype'));
+        return view('opgaver.valgt', compact('opg', 'type', 'subtype', 'input'));
     }
 
     public function tjekResultat(Handler $mathHandler)
     {
         $question = session('question');
-        $response = request('result');
-
-        if ( ! session()->has('question.instance'))
+        $response = request('results');
+        if ( ! session()->has('instance'))
         {
             $q = new Question();
             $q->result_set_id = session('result-set')->id;
             $q->tries = 0;
-            $q->question = $question['question.value'];
+            $q->question = $question['value'];
             $q->save();
-            session()->put('question.instance', $q);
+            session()->put('instance', $q);
         } else
-            $q = session('question.instance');
+            $q = session('instance');
         $q->tries = $q->tries + 1;
-        if ($mathHandler->sendToCorrection($question, $response))
+        $checked = $mathHandler->sendToCorrection($question, $response);
+        $correct = 0;
+        foreach($checked as $answer => $c)
+            if ($c) $correct++;
+        if ($correct == count($checked))
         {
-            $q->input = $response;
-            $q->save();
+            $q->input = json_encode($response);
             session()->forget('question');
-
-            return ['response' => true];
         }
-        else
-        {
-            $q->save();
-            return ['response' => false];
-        }
+        $q->save();
+        return $checked;
     }
 
     public function opgaver(ExerciseType $type)
