@@ -50,5 +50,15 @@ class ExercisesSeeder extends Seeder
             'id' => 41,
             'name' => 'equation-x-on-both-sides'
         ]);
+
+        $exercise->subExercises()->create([
+            'id' => 42,
+            'name' => 'equation-x-with-brackets'
+        ]);
+
+        $exercise->subExercises()->create([
+            'id' => 43,
+            'name' => 'equation-x-in-nominator'
+        ]);
     }
 }

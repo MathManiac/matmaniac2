@@ -5,39 +5,40 @@ namespace App\Opgaver\Equations;
 use App\Opgaver\QuestionInterface;
 use App\Opgaver\ResultInterface;
 
-class XOnOneSide implements QuestionInterface, ResultInterface
+class XInNominator implements QuestionInterface, ResultInterface
 {
 
     public function Ask()
     {
         $a = rand(2,15);
-        $b = rand(2,15);
-        $c = rand(1,5);
+        $b = rand(2,25);
+        $c = rand(2,5);
         $d = rand(6,11);
-        $i = rand(1,4);
+        //$i = rand(1,4);
+        $i=1;
         $question = [];
         switch ($i) {
             case 1:
                 $question = [
-                    'question.value' => "x + $c = $b",
+                    'question.value' => "{x + $d\over{$c}} = $b",
                     'question.numbers' => [$a, $b, $c, $d]
                 ];
                 break;
             case 2:
                 $question = [
-                    'question.value' => "x - $c = $b",
+                    'question.value' => "$c (x - $c) = $b",
                     'question.numbers' => [$a, $b, $c, $d]
                 ];
                 break;
             case 3:
                 $question = [
-                    'question.value' => "-x + $c = $b",
+                    'question.value' => "-$c (x - $c) = $b",
                     'question.numbers' => [$a, $b, $c, $d]
                 ];
                 break;
             case 4:
                 $question = [
-                    'question.value' => "$d x + $c = $b",
+                    'question.value' => "$c (-x + $c) = $b",
                     'question.numbers' => [$a, $b, $c, $d]
                 ];
         }
@@ -55,7 +56,7 @@ class XOnOneSide implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round($b - $c, 2);
+                $res = round($c*$b-$d, 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -64,7 +65,7 @@ class XOnOneSide implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round($b+$c,2);
+                $res = round(($b + $c*$c)/$c,2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -73,7 +74,7 @@ class XOnOneSide implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round($c-$b,2);
+                $res = round(($b - $c*$c)/-$c,2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
@@ -82,7 +83,7 @@ class XOnOneSide implements QuestionInterface, ResultInterface
                 $b = $question['question.numbers'][1];
                 $c = $question['question.numbers'][2];
                 $d = $question['question.numbers'][3];
-                $res = round(($b-$c)/$d,2);
+                $res = round(($c*$c-$b)/$c,2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return $res == round($input, 2);
