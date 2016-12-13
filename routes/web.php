@@ -11,47 +11,49 @@
 |
 */
 
-Route::get('/', function () {
+Route::get('/', function ()
+{
     return view('welcome');
 });
 
 Route::get('formel-samling', [
     'uses' => 'HomeController@formelSamling',
-    'as' => 'formel-samling'
+    'as'   => 'formel-samling'
 ]);
 
-Route::group(['prefix' => 'opgaver'], function () {
+Route::group(['prefix' => 'opgaver'], function ()
+{
 
     Route::get('{type?}', [
-        'as' => 'opgaver',
+        'as'   => 'opgaver',
         'uses' => 'HomeController@opgaver'
     ]);
 
     Route::get('{type}/{subtype}', [
         'uses' => 'HomeController@valgtOpgave',
-        'as' => 'valgtOpgave'
+        'as'   => 'valgtOpgave'
     ]);
 
     Route::get('{type}/{subtype}/start', [
         'uses' => 'HomeController@startOpgave',
-        'as' => 'startResultSet'
+        'as'   => 'startResultSet'
     ]);
 
     Route::get('{type}/{subtype}/end', [
         'uses' => 'HomeController@slutOpgave',
-        'as' => 'endResultSet'
+        'as'   => 'endResultSet'
     ]);
 
     Route::get('{type}/{subtype}/skip-question', [
         'uses' => 'TaskController@skipQuestion',
-        'as' => 'skip-opgave'
+        'as'   => 'skip-opgave'
     ]);
 });
 
 
 Route::post('tjek-resultat', [
     'uses' => 'HomeController@tjekResultat',
-    'as' => 'tjek-resultat'
+    'as'   => 'tjek-resultat'
 ]);
 
 Auth::routes();
