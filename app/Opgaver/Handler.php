@@ -37,7 +37,7 @@ class Handler
         $instance = new $this->types[$subExerciseId->id];
         $question = $instance->Ask();
         if ( ! array_key_exists('input', $question))
-            $question['input'][] = new Input('a');
+            $question['input'][] = new Input('result');
         return $question;
     }
 }
