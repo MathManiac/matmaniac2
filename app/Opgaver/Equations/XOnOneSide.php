@@ -17,19 +17,19 @@ class XOnOneSide extends Question implements QuestionInterface, ResultInterface
         return [
             1 => [
                 'value' => "x + $c = $b",
-                'numbers' => [$a, $b, $c, $d]
+                'numbers' => [$b, $c]
             ],
             2 => [
                 'value' => "x - $c = $b",
-                'numbers' => [$a, $b, $c, $d]
+                'numbers' => [$b, $c]
             ],
             3 => [
                 'value' => "-x + $c = $b",
-                'numbers' => [$a, $b, $c, $d]
+                'numbers' => [$b, $c]
             ],
             4 => [
                 'value' => "$d x + $c = $b",
-                'numbers' => [$a, $b, $c, $d]
+                'numbers' => [$b, $c, $d]
             ]
         ];
     }
@@ -37,36 +37,38 @@ class XOnOneSide extends Question implements QuestionInterface, ResultInterface
     public function validateQuestion($input, $question)
     {
         $input = (float)$input['result'];
+
         switch ($question['type']) {
+
             case 1:
-                $a = $question['numbers'][0];
+                //$a = $question['numbers'][0];
                 $b = $question['numbers'][1];
                 $c = $question['numbers'][2];
-                $d = $question['numbers'][3];
+                //$d = $question['numbers'][3];
                 $res = round($b - $c, 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return ['result' => $res == round($input, 2)];
             case 2:
-                $a = $question['numbers'][0];
+                //$a = $question['numbers'][0];
                 $b = $question['numbers'][1];
                 $c = $question['numbers'][2];
-                $d = $question['numbers'][3];
+                //$d = $question['numbers'][3];
                 $res = round($b+$c,2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return ['result' => $res == round($input, 2)];
             case 3:
-                $a = $question['numbers'][0];
+                //$a = $question['numbers'][0];
                 $b = $question['numbers'][1];
                 $c = $question['numbers'][2];
-                $d = $question['numbers'][3];
+                //$d = $question['numbers'][3];
                 $res = round($c-$b,2);
                 \Debugbar::addMessage($res, 'Resultat');
                 \Debugbar::addMessage($input, 'Input');
                 return ['result' => $res == round($input, 2)];
             case 4:
-                $a = $question['numbers'][0];
+                //$a = $question['numbers'][0];
                 $b = $question['numbers'][1];
                 $c = $question['numbers'][2];
                 $d = $question['numbers'][3];
