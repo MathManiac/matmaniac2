@@ -2,91 +2,81 @@
 
 namespace App\Opgaver\Equations;
 
+use App\Opgaver\Question;
 use App\Opgaver\QuestionInterface;
 use App\Opgaver\ResultInterface;
 
-class XWithBracets implements QuestionInterface, ResultInterface
+class XWithBracets extends Question implements QuestionInterface, ResultInterface
 {
-
-    public function Ask()
+    public function Questions()
     {
-        $a = rand(2,15);
-        $b = rand(2,25);
+        $b = rand(2,15);
         $c = rand(1,5);
-        $d = rand(6,11);
-        $i = rand(1,4);
 
-        $question = [];
-        switch ($i) {
-            case 1:
-                $question = [
-                    'question.value' => "$c (x + $c) = $b",
-                    'question.numbers' => [$a, $b, $c, $d]
-                ];
-                break;
-            case 2:
-                $question = [
-                    'question.value' => "$c (x - $c) = $b",
-                    'question.numbers' => [$a, $b, $c, $d]
-                ];
-                break;
-            case 3:
-                $question = [
-                    'question.value' => "-$c (x - $c) = $b",
-                    'question.numbers' => [$a, $b, $c, $d]
-                ];
-                break;
-            case 4:
-                $question = [
-                    'question.value' => "$c (-x + $c) = $b",
-                    'question.numbers' => [$a, $b, $c, $d]
-                ];
-        }
-        $question['question.type'] = $i;
-        return $question;
+        return [
+            1 => [
+                'value' => "$c (x + $c) = $b",
+                'numbers' => [$b, $c],
+            ],
+            2 => [
+                'value' => "$c (x - $c) = $b",
+                'numbers' => [$b, $c]
+            ],
+            3 => [
+                'value' => "-$c (x - $c) = $b",
+                'numbers' => [$b, $c]
+            ],
+            4 => [
+                'value' => "$c (-x + $c) = $b",
+                'numbers' => [$b, $c]
+            ]
+        ];
     }
-
 
     public function validateQuestion($input, $question)
     {
-        $input = (float)$input;
-        switch ($question['question.type']) {
+        $input = (float)$input['result'];
+
+        switch ($question['type']) {
+
             case 1:
-                $a = $question['question.numbers'][0];
-                $b = $question['question.numbers'][1];
-                $c = $question['question.numbers'][2];
-                $d = $question['question.numbers'][3];
+
+                $b = $question['numbers'][0];
+                $c = $question['numbers'][1];
+
                 $res = round(($b - $c*$c)/$c, 2);
-                \Debugbar::addMessage($res, 'Resultat');
+                \Debugbar::addMessage($res, 'result');
                 \Debugbar::addMessage($input, 'Input');
-                return $res == round($input, 2);
+                return ['result' => $res == round($input, 2)];
             case 2:
-                $a = $question['question.numbers'][0];
-                $b = $question['question.numbers'][1];
-                $c = $question['question.numbers'][2];
-                $d = $question['question.numbers'][3];
-                $res = round(($b + $c*$c)/$c,2);
-                \Debugbar::addMessage($res, 'Resultat');
+
+                $b = $question['numbers'][0];
+                $c = $question['numbers'][1];
+
+                $res = round(($b + $c*$c)/$c, 2);
+                \Debugbar::addMessage($res, 'result');
                 \Debugbar::addMessage($input, 'Input');
-                return $res == round($input, 2);
+                return ['result' => $res == round($input, 2)];
             case 3:
-                $a = $question['question.numbers'][0];
-                $b = $question['question.numbers'][1];
-                $c = $question['question.numbers'][2];
-                $d = $question['question.numbers'][3];
-                $res = round(($b - $c*$c)/-$c,2);
-                \Debugbar::addMessage($res, 'Resultat');
+
+                $b = $question['numbers'][0];
+                $c = $question['numbers'][1];
+
+                $res = round(($b - $c*$c)/-$c, 2);
+                \Debugbar::addMessage($res, 'result');
                 \Debugbar::addMessage($input, 'Input');
-                return $res == round($input, 2);
+                return ['result' => $res == round($input, 2)];
             case 4:
-                $a = $question['question.numbers'][0];
-                $b = $question['question.numbers'][1];
-                $c = $question['question.numbers'][2];
-                $d = $question['question.numbers'][3];
-                $res = round(($c*$c-$b)/$c,2);
-                \Debugbar::addMessage($res, 'Resultat');
+
+                $b = $question['numbers'][0];
+                $c = $question['numbers'][1];
+
+                $res = round(($c*$c-$b)/$c, 2);
+                \Debugbar::addMessage($res, 'result');
                 \Debugbar::addMessage($input, 'Input');
-                return $res == round($input, 2);
+                return ['result' => $res == round($input, 2)];
         }
     }
+
+
 }
