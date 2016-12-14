@@ -15,7 +15,7 @@ class SecondPoly extends Question implements QuestionInterface, ResultInterface
     {
         $a = rand(2, 4);
         $b = rand(7, 15);
-        $c = rand(1, 5);
+        $c = rand(1, 6);
         $questions = [
             1 => [
                 'value' => "f(x)=$a x^2+$b x+$c",
@@ -24,11 +24,23 @@ class SecondPoly extends Question implements QuestionInterface, ResultInterface
             2 => [
                 'value' => "f(x)=$a x^2-$b x-$c",
                 'numbers' => [$a, -$b, -$c]
+            ],
+            3 => [
+                'value' => "f(x)=-$a x^2-$b x-$c",
+                'numbers' => [-$a, -$b, -$c]
+            ],
+            4 => [
+                'value' => "f(x)=-$a x^2+$b x+$c",
+                'numbers' => [-$a, $b, $c]
+            ],
+            5 => [
+                'value' => "f(x)=$a x^2-$b x+$c",
+                'numbers' => [$a, $b, $c]
             ]
         ];
         foreach ($questions as &$question) {
             $question['input'] = [
-                new Input('x1', 'X1', '-.-'),
+                new Input('x1', 'X1', 'Ingen løsninger, klik "Tjek resultat"'),
                 new Input('x2', 'X2')
             ];
         }

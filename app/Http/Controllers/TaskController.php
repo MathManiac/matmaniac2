@@ -10,13 +10,13 @@ class TaskController extends Controller
     public function skipQuestion($type, $subtype)
     {
         if (session()->has('question')) {
-            if (!session()->has('question.instance')) {
+            if (!session()->has('instance')) {
                 $q = new Question();
-                $q->question = session('question')['question.value'];
+                $q->question = session('question')['value'];
                 $q->result_set_id = session('result-set')->id;
                 $q->tries = 0;
             } else
-                $q = session('question.instance');
+                $q = session('instance');
             $q->skipped = true;
             $q->save();
             session()->forget('question');

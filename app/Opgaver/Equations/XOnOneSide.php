@@ -37,7 +37,7 @@ class XOnOneSide extends Question implements QuestionInterface, ResultInterface
     public function validateQuestion($input, $question)
     {
         $input = (float)$input['result'];
-        
+
         switch ($question['type']) {
 
             case 1:
