@@ -2,49 +2,69 @@
 
 namespace App\Opgaver\Fractions;
 
+use App\Opgaver\Question;
 use App\Opgaver\QuestionInterface;
 use App\Opgaver\ResultInterface;
 
-class MultiplyTwoFracs implements ResultInterface, QuestionInterface
+class MultiplyTwoFracs extends Question implements ResultInterface, QuestionInterface
 {
+    public function Questions()
+    {
+        $a = rand(2,4);
+        $b = rand(2,15);
+        $c = rand(2,5);
+        $d = rand(6,11);
+        $e = rand(2,4);
+        return [
+            1 => [
+                'value' => "{{$a}\\over{$b}} \cdot {{$c}\\over{$d}}",
+                'numbers' => [$a, $b, $c, $d]
+            ],
+            2 => [
+                'value' => "{{-$a}\\over{$b}} \cdot {{$c}\\over{$d}}",
+                'numbers' => [-$a, $b, $c, $d]
+            ],
+            3 => [
+                'value' => "{{$a}\\over{-$b}} \cdot {{$c}\\over{$d}}",
+                'numbers' => [$a, -$b, $c, $d]
+            ]
+        ];
+    }
+
     public function validateQuestion($input, $question)
     {
-        $a = $question['numbers'][0];
-        $b = $question['numbers'][1];
-        $c = $question['numbers'][2];
-        $d = $question['numbers'][3];
+        $input = (float)$input['result'];
 
-        $input = (float)$input;
-        $res =($a*$c)/($b*$d);
-        return $input==round($res,2);
+        switch ($question['type']) {
+
+            case 1:
+                $a = $question['numbers'][0];
+                $b = $question['numbers'][1];
+                $c = $question['numbers'][2];
+                $d = $question['numbers'][3];
+                $res = round(($a*$c)/($b*$d), 2);
+                \Debugbar::addMessage($res, 'result');
+                \Debugbar::addMessage($input, 'Input');
+                return ['result' => $res == round($input, 2)];
+            case 2:
+                $a = $question['numbers'][0];
+                $b = $question['numbers'][1];
+                $c = $question['numbers'][2];
+                $d = $question['numbers'][3];
+                $res = round(($a*$c)/($b*$d), 2);
+                \Debugbar::addMessage($res, 'result');
+                \Debugbar::addMessage($input, 'Input');
+                return ['result' => $res == round($input, 2)];
+            case 3:
+                $a = $question['numbers'][0];
+                $b = $question['numbers'][1];
+                $c = $question['numbers'][2];
+                $d = $question['numbers'][3];
+                $res = round(($a*$c)/($b*$d), 2);
+                \Debugbar::addMessage($res, 'result');
+                \Debugbar::addMessage($input, 'Input');
+                return ['result' => $res == round($input, 2)];
+        }
     }
 
-    public function Ask()
-    {
-        $a = rand(1,15);
-        $b = rand(1,15);
-        $c = rand(1,15);
-        $d = rand(1,15);
-        return [
-            'question' => "{{$a}\\over{$b}} \cdot {{$c}\\over{$d}}",
-            'numbers' => [$a, $b, $c, $d]
-        ];
-
-        /*$a = rand(1,30);
-        if($a>15){
-            $a = $a-31;
-        }
-        $b = rand(1,30);
-        if($a>15){
-            $b = $b-31;
-        }
-        $c = rand(1,30);
-        if($c>15){
-            $c = $c-31;
-        }*/
-        return [
-            'question' => "{{$c}\over{($a + x)}} = $b",
-            'numbers' => [$a, $b, $c]
-        ];
-    }
 }
