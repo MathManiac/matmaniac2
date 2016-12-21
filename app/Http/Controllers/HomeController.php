@@ -62,8 +62,7 @@ class HomeController extends Controller {
         $resultSet = session('result-set');
         $resultSet->ended_at = date('Y-m-d H:i:s');
         $resultSet->save();
-        session()->forget('result-set');
-        session()->forget('question');
+        session()->forget(['result-set', 'question', 'chain']);
 
         return redirect()->route('opgaver')->withSuccess('Opgaven blev afsluttet.');
     }
@@ -82,10 +81,11 @@ class HomeController extends Controller {
             } else
                 $question = session('question');
             $opg = $question['value'];
+            $text = array_key_exists('text', $question) ? $question['text'] : null;
             $input = $question['input'];
         }
 
-        return view('opgaver.valgt', compact('opg', 'type', 'subtype', 'input'));
+        return view('opgaver.valgt', compact('opg', 'type', 'subtype', 'input', 'text'));
     }
 
     public function tjekResultat(Handler $mathHandler)
@@ -109,6 +109,13 @@ class HomeController extends Controller {
             if ($c) $correct++;
         if ($correct == count($checked))
         {
+            if ($question['follow-up'])
+            {
+                $question['result'] = $response;
+                session()->push('chain.list', $question);
+            }
+            else
+                session()->forget('chain');
             $q->input = json_encode($response);
             session()->forget('question');
         }

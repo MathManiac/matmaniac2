@@ -7,6 +7,7 @@ use App\Opgaver\Equations\XOnBothSides;
 use App\Opgaver\Fractions\MultiplyTwoFracs;
 use App\Opgaver\Equations\XWithBracets;
 use App\Opgaver\Equations\XInNominator;
+use App\Opgaver\Fractions\OneFrac;
 use App\Opgaver\Functions\SecondPoly;
 use App\Opgaver\Functions\TwoPointsExponential;
 
@@ -29,14 +30,24 @@ class Handler
     public function sendToCorrection(Array $question, $resultat)
     {
         $instance = new $this->types[$question['subType']->id];
-        return $instance->validateQuestion($resultat, $question);
+        if (session()->has('chain')) {
+            //validate chain question
+            $questionIdentifier = questionIdentifierFromChain();
+            $validationMethod = "followUpValidationQ$questionIdentifier";
+            $result = $instance->$validationMethod($resultat, $question);
+        }
+        else
+            $result = $instance->validateQuestion($resultat, $question);
+        if (config('app.debug'))
+            \Debugbar::addMessage($resultat, 'Input');
+        return $result;
     }
 
     public function getQuestion($subExerciseId)
     {
         $instance = new $this->types[$subExerciseId->id];
         $question = $instance->Ask();
-        if ( ! array_key_exists('input', $question))
+        if (!array_key_exists('input', $question))
             $question['input'][] = new Input('result');
         return $question;
     }
