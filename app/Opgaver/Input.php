@@ -10,7 +10,7 @@ class Input
      * @param string $title
      * @param $name
      */
-    public function __construct($name, $title = 'Dit svar', $placeholder = '')
+    public function __construct($name = 'result', $title = 'Dit svar', $placeholder = '')
     {
         $this->title = $title;
         $this->name = $name;
