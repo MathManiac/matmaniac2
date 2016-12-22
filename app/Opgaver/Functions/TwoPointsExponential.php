@@ -18,7 +18,7 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
         $d = rand(6,14);
         return  [
             1 => [
-                'text' => 'Find a for eksponentielle funktion.',
+                'text' => 'Find a for den eksponentielle funktion.',
                 'value' => "A($a ; $b) \\; B($c ; $d)",
                 'numbers' => [$a, $b, $c, $d],
                 'input' => [
@@ -100,8 +100,8 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
     public function followUpValidationQ1_1_1($input, $question)
     {
         $input = (float)$input['percent'];
-        $resA = session('chain.results.a');
-        $per = $resA-1;
+        $resA = session('chain.results.a')*100;
+        $per = (float)($resA-100);
         if($per < 0)
         {
             $per*=(-1);
@@ -120,10 +120,10 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
 
             case 1:
                 $a = $question['numbers'][0];
-                $b = $question['numbers'][0];
-                $c = $question['numbers'][1];
+                $b = $question['numbers'][1];
+                $c = $question['numbers'][2];
                 $d = $question['numbers'][3];
-                $res = round(($d - $b)/($c - $a), 2);
+                $res = round((pow(($d/$b),1/($c - $a))), 2);
                 \Debugbar::addMessage($res, 'Resultat');
                 return ['a' => $res == round($input, 2)];
 
