@@ -14,6 +14,7 @@ abstract class Question
             session()->put('chain.previous', session('chain.list')[$chainLength-1]);
             $questionIdentifier = questionIdentifierFromChain();
             $questionMethod = "followUpQuestionQ$questionIdentifier";
+
             foreach (session('chain.previous')['result'] as $variable => $result)
                 session()->put('chain.results.' . $variable, $result);
         }

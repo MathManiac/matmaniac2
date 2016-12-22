@@ -1,5 +1,6 @@
 function validateQuestion() {
-    $input = $('input[name^=answer]');
+    $isCorrect = false;
+    $input = $('input[name^=answer],select[name^=answer]');
     $('#validateBtn').prop("disabled",true);
     $data = {};
     $.each($input, function(index, input){
@@ -18,6 +19,7 @@ function validateQuestion() {
         var $correct = 0;
         $.each(data, function(index, response){
             $('#answer-' + index).addClass('has-feedback');
+            console.log(data, response);
             if (response == true) {
                 $('#answer-' + index).addClass('has-success');
                 $('#answer-' + index).removeClass('has-error');
@@ -35,26 +37,11 @@ function validateQuestion() {
             $('#skipBtn').text('Næste Spørgsmål');
             $('#skipBtn').removeClass('btn-danger');
             $('#skipBtn').addClass('btn-success');
+            $('#validateBtn').prop("disabled", true);
+            $isCorrect = true;
         }
-        /*$('#answerArea').addClass('has-feedback');
-        if (data.response == true) {
-            $('#answerArea').addClass('has-success');
-            $('#answerArea').removeClass('has-error');
-            $('#incorrectIcon').hide();
-            $('#correctIcon').show();
-            $('#validateBtn').remove();
-            $('#skipBtn').text('Næste Spørgsmål');
-            $('#skipBtn').removeClass('btn-danger');
-            $('#skipBtn').addClass('btn-success');
-
-        }
-        else {
-            $('#answerArea').addClass('has-error');
-            $('#answerArea').removeClass('has-success');
-            $('#incorrectIcon').show();
-            $('#correctIcon').hide();
-        }*/
     }).always(function(){
-        $('#validateBtn').prop("disabled",false);
+        if (!$isCorrect)
+            $('#validateBtn').prop("disabled",false);
     });
 }

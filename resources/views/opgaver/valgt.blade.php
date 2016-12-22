@@ -23,7 +23,7 @@
             <div class="col-md-8">
                 @if( ! is_null($text))
                     <p>
-                        <i class="fa fa-question-circle"></i> <b>{{ $text }}</b>
+                        <i class="fa fa-question-circle"></i> <b>{!! $text !!}</b>
                     </p>
                 @endif
                 $${{ $opg }}$$
@@ -33,12 +33,21 @@
                             @foreach($input as $i)
                                 <div class="form-group" id="answer-{{ $i->name }}" class="answerArea">
                                     <label class="control-label" for="inputError2">{{ $i->title }}</label>
-                                    <input type="text" class="form-control" placeholder="{{ $i->placeholder }}"
-                                           name="answer[{{ $i->name }}]" aria-describedby="inputError2Status">
-                                    <span class="glyphicon glyphicon-remove form-control-feedback" style="display:none"
-                                          id="incorrectIcon-{{ $i->name }}" aria-hidden="true"></span>
-                                    <span class="glyphicon glyphicon-ok form-control-feedback" style="display:none"
-                                          id="correctIcon-{{ $i->name }}" aria-hidden="true"></span>
+                                    @if($i->type == 'text')
+                                        <input type="text" class="form-control" placeholder="{{ $i->placeholder }}"
+                                               name="answer[{{ $i->name }}]" aria-describedby="inputError2Status">
+                                        <span class="glyphicon glyphicon-remove form-control-feedback"
+                                              style="display:none"
+                                              id="incorrectIcon-{{ $i->name }}" aria-hidden="true"></span>
+                                        <span class="glyphicon glyphicon-ok form-control-feedback" style="display:none"
+                                              id="correctIcon-{{ $i->name }}" aria-hidden="true"></span>
+                                    @elseif($i->type == 'select')
+                                        <select class="form-control" name="answer[{{ $i->name }}]">
+                                            @foreach($i->options as $option)
+                                                <option value="{{ $option }}">{{ ucfirst(trans('tasks.expressions.'.$option)) }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

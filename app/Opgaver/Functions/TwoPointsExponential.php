@@ -13,19 +13,19 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
     public function Questions()
     {
         $a = rand(2, 4);
-        $b = rand(7, 15);
-        $c = rand(1, 6);
-        $d = rand(1,8);
+        $b = rand(1, 5);
+        $c = rand(5, 9);
+        $d = rand(6,14);
         return  [
             1 => [
                 'text' => 'Find a for eksponentielle funktion.',
-                'value' => "A($a; $b) \\; B($c ; $d)",
+                'value' => "A($a ; $b) \\; B($c ; $d)",
                 'numbers' => [$a, $b, $c, $d],
                 'input' => [
                     new Input('a')
                 ],
                 'follow-up' => true
-            ]
+            ],
         ];
     }
 
@@ -33,8 +33,6 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
     public function followUpQuestionQ1()
     {
         $previousQuestion = session('chain.previous');
-        $a = $previousQuestion['numbers'][0];
-        $b = $previousQuestion['numbers'][1];
         return [
             1 => [
                 'value' => '',
@@ -56,7 +54,7 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
         $resA = session('chain.results.a');
         $res = round($b/pow($resA,$a),2);
         \Debugbar::addMessage($res, 'Resultat');
-        return ['result' => $res == round($input, 2)];
+        return ['b' => $res == round($input, 2)];
     }
     #endregion
 
@@ -65,16 +63,54 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
     {
         $resA = session('chain.results.a');
         $resB = session('chain.results.b');
+        $input = new Input('development', 'Bestem udviklingen');
+        $input->type = 'select';
+        $input->options = ['decreasing', 'increasing'];
         return [
             1 => [
                 'value' => '',
                 'text' => "Funktionen hedder f(x) = $$resB \\cdot $resA^x$, <br>
                     er funktionen voksende eller aftagende?",
-                'follow-up' => true
+                'follow-up' => true,
+                'input' => [$input]
             ]
         ];
     }
+
+    public function followUpValidationQ1_1($input, $question)
+    {
+        $input = $input['development'];
+        $resA = session('chain.results.a');
+        \Debugbar::addMessage($resA > 1 ? 'increasing' : 'decreasing', 'Resultat');
+        return ['development' => ($resA > 1 && $input == 'increasing') || ($resA < 1 && $input == 'decreasing')];
+    }
     #endregion
+
+    public function followUpQuestionQ1_1_1()
+    {
+        return [
+            1 => [
+                'value' => '',
+                'text' => "Med hvor mange procent?",
+                'input' => [new Input('percent')]
+            ]
+        ];
+    }
+
+    public function followUpValidationQ1_1_1($input, $question)
+    {
+        $input = (float)$input['percent'];
+        $resA = session('chain.results.a');
+        $per = $resA-1;
+        if($per < 0)
+        {
+            $per*=(-1);
+        }
+        \Debugbar::addMessage($per);
+        return ['percent' => $per == $input];
+    }
+
+
 
     public function validateQuestion($input, $question)
     {
@@ -89,7 +125,7 @@ class TwoPointsExponential extends Question implements QuestionInterface, Result
                 $d = $question['numbers'][3];
                 $res = round(($d - $b)/($c - $a), 2);
                 \Debugbar::addMessage($res, 'Resultat');
-                return ['result' => $res == round($input, 2)];
+                return ['a' => $res == round($input, 2)];
 
         }
     }

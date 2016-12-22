@@ -17,5 +17,9 @@ return [
         'equation-x-in-nominator' => 'x i tælleren',
         'second-poly' => 'Andengradspolynomium',
         'two-points-exponential' => 'To punkter, eksponentiel'
+    ],
+    'expressions' => [
+        'increasing' => 'voksende',
+        'decreasing' => 'aftagende'
     ]
 ];

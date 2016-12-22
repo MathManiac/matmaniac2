@@ -16,31 +16,42 @@ Route::get('/', function ()
     return view('welcome');
 });
 
-Route::get('formel-samling', [
-    'uses' => 'HomeController@formelSamling',
-    'as'   => 'formel-samling'
-]);
+Route::group(['prefix' => 'formel-samling'], function(){
+    Route::get('{category?}', [
+        'uses' => 'FormelSamlingController@index',
+        'as'   => 'formel-samling'
+    ]);
+
+    Route::get('{category}/{subject}', [
+        'uses' => 'FormelSamlingController@valgt',
+        'as'   => 'formel-samling-valgt'
+    ]);
+});
 
 Route::group(['prefix' => 'opgaver'], function ()
 {
+    Route::get('results/{resultSet?}', [
+        'uses' => 'TaskController@results',
+        'as' => 'showResults'
+    ]);
 
     Route::get('{type?}', [
         'as'   => 'opgaver',
-        'uses' => 'HomeController@opgaver'
+        'uses' => 'TaskController@opgaver'
     ]);
 
     Route::get('{type}/{subtype}', [
-        'uses' => 'HomeController@valgtOpgave',
+        'uses' => 'TaskController@valgtOpgave',
         'as'   => 'valgtOpgave'
     ]);
 
     Route::get('{type}/{subtype}/start', [
-        'uses' => 'HomeController@startOpgave',
+        'uses' => 'TaskController@startOpgave',
         'as'   => 'startResultSet'
     ]);
 
     Route::get('{type}/{subtype}/end', [
-        'uses' => 'HomeController@slutOpgave',
+        'uses' => 'TaskController@slutOpgave',
         'as'   => 'endResultSet'
     ]);
 
@@ -52,7 +63,7 @@ Route::group(['prefix' => 'opgaver'], function ()
 
 
 Route::post('tjek-resultat', [
-    'uses' => 'HomeController@tjekResultat',
+    'uses' => 'TaskController@tjekResultat',
     'as'   => 'tjek-resultat'
 ]);
 

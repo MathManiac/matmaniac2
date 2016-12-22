@@ -16,13 +16,14 @@ class CreateQuestionsTable extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('result_set_id');
-            $table->integer('tries')->default(0);
-            $table->string('question');
-            $table->string('input')->nullable();
+            $table->string('text')->nullable();
+            $table->string('value')->nullable();
+            $table->unsignedInteger('previous_id')->nullable();
             $table->boolean('skipped')->default(0);
             $table->timestamps();
 
             $table->foreign('result_set_id')->references('id')->on('result_sets');
+            $table->foreign('previous_id')->references('id')->on('questions');
         });
     }
 

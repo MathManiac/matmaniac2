@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->clearTables();
         $this->call(UsersTableSeeder::class);
         $this->call(ExercisesSeeder::class);
+        $this->call(FormelsamlingSeeder::class);
     }
 
     public function clearTables()
@@ -23,6 +24,9 @@ class DatabaseSeeder extends Seeder
             'users',
             'sub_exercise_types',
             'exercise_types',
+            'subject_columns',
+            'subjects',
+            'categories'
         ];
         foreach($tables as $table)
             DB::table($table)->truncate();

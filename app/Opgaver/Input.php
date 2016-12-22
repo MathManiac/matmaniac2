@@ -22,4 +22,8 @@ class Input
     public $name;
 
     public $placeholder;
+
+    public $type = 'text';
+
+    public $options = [];
 }
