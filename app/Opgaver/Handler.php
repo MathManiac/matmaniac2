@@ -122,5 +122,4 @@ class Handler
         return $correct;
         //dd($question, $input);
     }
-
 }

@@ -1,0 +1,1 @@
+<h2 @if(is_null($task)) class="text-muted" @endif>@if(is_null($task)) Inputs @else <a href="{{ route('admin.tasks.inputs', $task) }}">Inputs</a>@endif</h2>

@@ -13,7 +13,7 @@
     <!-- Styles -->
     <link href="/css/app.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
+    @yield('styles')
     <!-- Scripts -->
     <script>
         window.Laravel = <?php echo json_encode([
@@ -85,9 +85,7 @@
             </div>
         </div>
     </nav>
-
     @yield('content')
-
 </div>
 
 <!-- Scripts -->

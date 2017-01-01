@@ -16,7 +16,8 @@ Route::get('/', function ()
     return view('welcome');
 });
 
-Route::group(['prefix' => 'formel-samling'], function(){
+Route::group(['prefix' => 'formel-samling'], function ()
+{
     Route::get('{category?}', [
         'uses' => 'FormelSamlingController@index',
         'as'   => 'formel-samling'
@@ -32,7 +33,7 @@ Route::group(['prefix' => 'opgaver'], function ()
 {
     Route::get('results/{resultSet?}', [
         'uses' => 'TaskController@results',
-        'as' => 'showResults'
+        'as'   => 'showResults'
     ]);
 
     Route::get('{type?}', [
@@ -70,5 +71,33 @@ Route::post('tjek-resultat', [
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], function ()
+{
+
+    Route::group(['prefix' => 'tasks', 'as' => 'tasks.'], function ()
+    {
+
+        Route::get('create/{task?}', [
+            'as'   => 'create',
+            'uses' => 'TaskController@create'
+        ]);
+
+        Route::post('create/{task?}', [
+            'as'   => 'doCreate',
+            'uses' => 'TaskController@doCreate'
+        ]);
+
+        Route::get('{task}/inputs', [
+            'as'   => 'inputs',
+            'uses' => 'TaskController@inputs'
+        ]);
+
+        Route::get('validate-code', [
+            'as'   => 'validate',
+            'uses' => 'TaskController@validateCode'
+        ]);
+    });
+});
 
 //Route til billeder

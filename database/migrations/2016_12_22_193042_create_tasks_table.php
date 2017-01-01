@@ -16,12 +16,15 @@ class CreateTasksTable extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('sub_exercise_id');
+            $table->unsignedInteger('chained_to')->nullable();
             $table->longText('generator');
             $table->longText('validator');
+            $table->enum('status', ['available','testing','disabled','unfinished'])->default('disabled');
             $table->text('options');
             $table->timestamps();
 
             $table->foreign('sub_exercise_id')->references('id')->on('sub_exercise_types');
+            $table->foreign('chained_to')->references('id')->on('tasks');
         });
     }
 
