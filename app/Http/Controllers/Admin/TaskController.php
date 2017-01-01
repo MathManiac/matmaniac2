@@ -22,13 +22,6 @@ class TaskController extends Controller {
         $json['value'] = 'A($a ; $b) \\\\; B($c ; $d)';
         $json['input'] = [];
 
-        //return $json;
-        if ( ! is_null($task))
-        {
-            $taskResolver = app()->make(TaskResolver::class);
-            $genOptions = $taskResolver->generateFormula($task);
-        }
-
         return view('admin.tasks.create', compact('task', 'genOptions'));
     }
 
@@ -53,7 +46,7 @@ class TaskController extends Controller {
         //endregion
         //region Check code for syntax errors
         $line = preg_replace('/\s+/', '', request('variables'));
-        $run = "php " . app_path() . "\\code-validation.php ". addslashes($line);
+        $run = "php " . app_path() . "\\code-validation.php " . addslashes($line);
         $run = exec($run);
         if ($run != "")
             return redirect()->route('admin.tasks.create', $task)
@@ -87,14 +80,28 @@ class TaskController extends Controller {
 
     public function inputs(Task $task)
     {
-        return view('admin.tasks.master');
+        $inputs = $task->options['input'];
+        return view('admin.tasks.inputs', compact('task', 'inputs'));
     }
 
-    public function validateCode()
+    public function addInput()
     {
-        $code = request('code');
-        eval($code);
+        return redirect()->back()->withNewInput(request('type'));
+    }
 
-        return '1';
+    public function saveInput(Task $task)
+    {
+        $taskOptions = $task->options;
+        $currentInput = $taskOptions['input'];
+        $newInput = [
+            'type' => request('new.type'),
+            'format' => request('new.format'),
+            'text' => request('new.text'),
+            'name' => request('new.name')
+        ];
+        $currentInput[] = $newInput;
+        $taskOptions['input'] = $currentInput;
+        $task->update(['options' => $taskOptions]);
+        return redirect()->route('admin.tasks.inputs');
     }
 }

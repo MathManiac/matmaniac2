@@ -93,9 +93,14 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
             'uses' => 'TaskController@inputs'
         ]);
 
-        Route::get('validate-code', [
-            'as'   => 'validate',
-            'uses' => 'TaskController@validateCode'
+        Route::get('{task}/inputs/add-input', [
+            'as'   => 'addInput',
+            'uses' => 'TaskController@addInput'
+        ]);
+
+        Route::post('{task}/inputs', [
+            'as'   => 'saveInput',
+            'uses' => 'TaskController@saveInput'
         ]);
     });
 });
