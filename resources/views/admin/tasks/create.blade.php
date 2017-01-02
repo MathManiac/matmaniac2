@@ -23,7 +23,6 @@
             <p class="text-info">Use LaTeX. Variables from above should be referenced here.</p>
         </div>
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
-        <a href="#" class="btn btn-success">Next <i class="fa fa-arrow-right"></i></a>
     </form>
 @endsection
 

@@ -3,33 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Opgaver\TaskRepository\Resolver;
 use App\Opgaver\TaskResolver;
 use App\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller {
 
-    private $allowedFunctions = ['rand'];
+    private $allowedFunctions = ['rand', 'pow', 'sqrt'];
 
-
-    public function create($task = null)
+    private function getForbiddenFunctions($variables)
     {
-        /*$test = "php " . app_path() . "\\code-validation.php " . escapeshellcmd('$s2=rand(1,1);');
-        $test = exec($test);
-        dd($test);*/
-        $json = [];
-        $json['text'] = "some question";
-        $json['value'] = 'A($a ; $b) \\\\; B($c ; $d)';
-        $json['input'] = [];
-
-        return view('admin.tasks.create', compact('task', 'genOptions'));
-    }
-
-    public function doCreate($task = null)
-    {
-        //region check for forbidden functions
         $functions = [];
-        foreach (preg_split("/((\r?\n)|(\r\n?))/", request('variables')) as $line)
+        foreach (preg_split("/((\r?\n)|(\r\n?))/", $variables) as $line)
         {
             $line = preg_replace('/\s+/', '', $line);
             if ( ! preg_match('#([A-Za-z0-9_]+)\((.*)\)#', $line))
@@ -39,23 +25,42 @@ class TaskController extends Controller {
         }
         $functions = array_unique($functions);
         $forbiddenFunctions = array_diff($functions, array_intersect($functions, $this->allowedFunctions));
+        return $forbiddenFunctions;
+    }
+
+    private function getErrors($variables)
+    {
+        $line = preg_replace('/\s+/', '', $variables);
+        $run = "php " . app_path() . "\\code-validation.php " . addslashes($line);
+        $run = exec($run);
+        return $run;
+    }
+
+    public function create($task = null)
+    {
+        return view('admin.tasks.create', compact('task', 'genOptions'));
+    }
+
+    public function doCreate($task = null)
+    {
+        $forbiddenFunctions = $this->getForbiddenFunctions(request('variables'));
         if (count($forbiddenFunctions) > 0)
             return redirect()->route('admin.tasks.create', $task)
                 ->withInput()
                 ->withError('The following functions are not allowed: ' . implode(', ', $forbiddenFunctions));
-        //endregion
-        //region Check code for syntax errors
-        $line = preg_replace('/\s+/', '', request('variables'));
-        $run = "php " . app_path() . "\\code-validation.php " . addslashes($line);
-        $run = exec($run);
-        if ($run != "")
+        $codeErrors = $this->getErrors(request('variables'));
+        if ($codeErrors != "")
             return redirect()->route('admin.tasks.create', $task)
                 ->withInput()
-                ->withError($run);
-        //endregion
+                ->withError($codeErrors);
+        if(is_null($task))
+            $options = [];
+        else
+            $options = $task->options;
         $options['text'] = request('question');
         $options['value'] = request('math-question');
-        $options['input'] = [];
+        if ( ! array_key_exists('input', $options))
+            $options['input'] = [];
         if (is_null($task))
         {
             $task = Task::create([
@@ -102,6 +107,80 @@ class TaskController extends Controller {
         $currentInput[] = $newInput;
         $taskOptions['input'] = $currentInput;
         $task->update(['options' => $taskOptions]);
-        return redirect()->route('admin.tasks.inputs');
+        return redirect()->route('admin.tasks.inputs', [$task->id]);
+    }
+
+    public function updateInputs(Task $task)
+    {
+        $taskOptions = $task->options;
+        $currentInput = $taskOptions['input'];
+        $newInput = request('input');
+        for ($i = 0; $i < count($newInput); $i++)
+        {
+            $currentInput[$i]['text'] = $newInput[$i]['text'];
+            $currentInput[$i]['name'] = $newInput[$i]['name'];
+            $currentInput[$i]['format'] = $newInput[$i]['format'];
+        }
+        $taskOptions['input'] = $currentInput;
+        $task->update(['options' => $taskOptions]);
+        return redirect()->route('admin.tasks.inputs', [$task->id]);
+    }
+
+    public function inputAction(Task $task)
+    {
+        $options = $task->options;
+        $inputs = $options['input'];
+        if (request('action') == 'delete')
+            unset($inputs[request('id')]);
+        if(request('action') == 'move-up' || request('action') == 'move-down')
+        {
+            $upOrDown = request('action') == 'move-up' ? -1 : +1;
+            $temp = $inputs[request('id')];
+            $inputs[request('id')] = $inputs[request('id')+$upOrDown];
+            $inputs[request('id')+$upOrDown] = $temp;
+        }
+        $inputs = array_values($inputs);
+        $options['input'] = $inputs;
+        $task->update(['options' => $options]);
+        return redirect()->route('admin.tasks.inputs', [$task->id]);
+    }
+
+    public function validation(Task $task)
+    {
+        $taskResolver = app()->make(Resolver::class);
+        $variables = $taskResolver->getGeneratorVariables($task);
+        $requiredVariables = $taskResolver->getInputVariables($task);
+        array_walk($requiredVariables, function(&$value, $key) { $value = '<b>$answer' . studly_case($value) . '</b>'; });
+        $isAnswered = $taskResolver->allInputsAnswered($task);
+        return view('admin.tasks.validation', compact('task', 'variables', 'requiredVariables', 'isAnswered'));
+    }
+    public function saveValidation(Task $task)
+    {
+        $variables = $task->generator . request('variables');
+        $forbiddenFunctions = $this->getForbiddenFunctions(request('variables'));
+        if (count($forbiddenFunctions) > 0)
+            return redirect()->route('admin.tasks.validation', $task)
+                ->withInput()
+                ->withError('The following functions are not allowed: ' . implode(', ', $forbiddenFunctions));
+        $codeErrors = $this->getErrors($variables);
+        if ($codeErrors != "")
+            return redirect()->route('admin.tasks.validation', $task)
+                ->withInput()
+                ->withError($codeErrors);
+        $task->update(['validator' => request('variables')]);
+        return redirect()->route('admin.tasks.validation', $task)->withSuccess('The task was updated.');
+    }
+
+    public function final(Task $task)
+    {
+        return view('admin.tasks.final', compact('task'));
+    }
+
+    public function runTests(Task $task)
+    {
+        $questions = [];
+        foreach(range(1, 20) as $try)
+            $questions[] = $task->getQuestion(true);
+        return view('admin.tasks.runTests', compact('task', 'questions'));
     }
 }

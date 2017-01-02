@@ -4,27 +4,44 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                <div class="container-fluid">
+                <div class="row">
                     <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-12">
-                                @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', $task->id).'">Generator</a></h2>')
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                @if(is_null($task))
-                                    <h2 class="text-muted">Input</h2>
-                                @else
-                                    @yield('inputContent', '<h2><a href="'.route('admin.tasks.inputs', $task->id).'">Input</a></h2>')
-                                @endif
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
+                        @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', is_null($task) ? [] : $task->id).'">Generator</a></h2>')
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @if(is_null($task))
+                            <h2 class="text-muted">Input</h2>
+                        @else
+                            @yield('inputContent', '<h2><a href="'.route('admin.tasks.inputs', $task->id).'">Input</a></h2>')
+                        @endif
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @if(is_null($task))
+                            <h2 class="text-muted">Validation</h2>
+                        @else
+                            @if(count($task->options['input']))
+                                @yield('validationContent', '<h2><a href="'.route('admin.tasks.validation', $task->id).'">Validation</a></h2>')
+                            @else
+                                <h2 class="text-muted">Validation</h2>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        @if(is_null($task))
+                            <h2 class="text-muted">Final</h2>
+                        @else
+                            @if($task->allInputsAnswered() && count($task->options['input']) > 0)
+                                @yield('finalContent', '<h2><a href="'.route('admin.tasks.final', $task->id).'">Final</a></h2>')
+                            @else
                                 <h2 class="text-muted">Final</h2>
-                            </div>
-                        </div>
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>
@@ -33,7 +50,7 @@
                     <div class="panel-heading">Type</div>
                 </div>
                 @unless(is_null($task))
-                    @include('admin.tasks.partials.preview', ['genOptions' => app()->make(App\Opgaver\TaskResolver::class)->generateFormula($task)])
+                    @include('admin.tasks.partials.preview', ['genOptions' => app()->make(App\Opgaver\TaskRepository\Resolver::class)])
                 @endunless
                 @yield('sidebar')
             </div>
@@ -49,6 +66,9 @@
     @endif
     @if(session()->has('error'))
         <script>swal("Error", "{{ addslashes(session('error')) }}", "error")</script>
+    @endif
+    @if(session()->has('warning'))
+        <script>swal("Warning", "{!! addslashes(session('warning')) !!}", "warning")</script>
     @endif
 @endsection
 

@@ -93,6 +93,11 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
             'uses' => 'TaskController@inputs'
         ]);
 
+        Route::post('{task}/inputs/update', [
+            'as'   => 'updateInputs',
+            'uses' => 'TaskController@updateInputs'
+        ]);
+
         Route::get('{task}/inputs/add-input', [
             'as'   => 'addInput',
             'uses' => 'TaskController@addInput'
@@ -101,6 +106,31 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
         Route::post('{task}/inputs', [
             'as'   => 'saveInput',
             'uses' => 'TaskController@saveInput'
+        ]);
+
+        Route::get('{task}/inputs/action', [
+            'as'   => 'inputAction',
+            'uses' => 'TaskController@inputAction'
+        ]);
+
+        Route::get('{task}/validation', [
+            'as'   => 'validation',
+            'uses' => 'TaskController@validation'
+        ]);
+
+        Route::post('{task}/validation', [
+            'as'   => 'saveValidation',
+            'uses' => 'TaskController@saveValidation'
+        ]);
+
+        Route::get('{task}/final', [
+            'as'   => 'final',
+            'uses' => 'TaskController@final'
+        ]);
+
+        Route::get('{task}/run-tests', [
+            'as'   => 'runTests',
+            'uses' => 'TaskController@runTests'
         ]);
     });
 });
