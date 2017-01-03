@@ -4,6 +4,9 @@
     <h2>Generator</h2>
     <form method="post">
         {!! csrf_field() !!}
+        @if(request()->has('previous'))
+            <input type="hidden" name="previous" value="{{ request('previous') }}">
+        @endif
         <div class="form-group">
             <label>Question</label>
             <input type="text" name="question" value="{{ old('question', is_null($task) ? '' : $task->options['text']) }}"

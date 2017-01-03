@@ -132,6 +132,11 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
             'as'   => 'runTests',
             'uses' => 'TaskController@runTests'
         ]);
+
+        Route::post('{task}/final', [
+            'as' => 'changeStatus',
+            'uses' => 'TaskController@updateStatus'
+        ]);
     });
 });
 

@@ -26,4 +26,9 @@ class Task extends Model
         $taskResolver = app()->make(Resolver::class);
         return $taskResolver->generateQuestion($this, $withResult);
     }
+
+    public function previous()
+    {
+        return $this->belongsTo(Task::class, 'chained_to');
+    }
 }

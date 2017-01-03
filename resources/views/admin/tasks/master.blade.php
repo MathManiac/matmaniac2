@@ -6,7 +6,15 @@
             <div class="col-md-8">
                 <div class="row">
                     <div class="col-md-12">
-                        @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', is_null($task) ? [] : $task->id).'">Generator</a></h2>')
+                        @if(is_null($task))
+                            @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', is_null($task) ? [] : $task->id).'">Generator</a></h2>')
+                        @else
+                            @if($task->status == 'unfinished')
+                                @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', is_null($task) ? [] : $task->id).'">Generator</a></h2>')
+                            @else
+                                <h2 class="text-muted">Generator</h2>
+                            @endif
+                        @endif
                     </div>
                 </div>
                 <div class="row">
@@ -14,8 +22,13 @@
                         @if(is_null($task))
                             <h2 class="text-muted">Input</h2>
                         @else
-                            @yield('inputContent', '<h2><a href="'.route('admin.tasks.inputs', $task->id).'">Input</a></h2>')
+                            @if($task->status == 'unfinished')
+                                @yield('inputContent', '<h2><a href="'.route('admin.tasks.inputs', $task->id).'">Input</a></h2>')
+                            @else
+                                <h2 class="text-muted">Input</h2>
+                            @endif
                         @endif
+
                     </div>
                 </div>
                 <div class="row">
@@ -23,12 +36,17 @@
                         @if(is_null($task))
                             <h2 class="text-muted">Validation</h2>
                         @else
-                            @if(count($task->options['input']))
-                                @yield('validationContent', '<h2><a href="'.route('admin.tasks.validation', $task->id).'">Validation</a></h2>')
+                            @if($task->status == 'unfinished')
+                                @if(count($task->options['input']))
+                                    @yield('validationContent', '<h2><a href="'.route('admin.tasks.validation', $task->id).'">Validation</a></h2>')
+                                @else
+                                    <h2 class="text-muted">Validation</h2>
+                                @endif
                             @else
                                 <h2 class="text-muted">Validation</h2>
                             @endif
                         @endif
+
                     </div>
                 </div>
                 <div class="row">
@@ -49,6 +67,9 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">Type</div>
                 </div>
+                @if(request()->has('previous') || ( ! is_null($task)  && ! is_null($task->chained_to)))
+                    @include('admin.tasks.partials.chain')
+                @endif
                 @unless(is_null($task))
                     @include('admin.tasks.partials.preview', ['genOptions' => app()->make(App\Opgaver\TaskRepository\Resolver::class)])
                 @endunless

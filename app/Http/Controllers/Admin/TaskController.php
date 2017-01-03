@@ -123,7 +123,7 @@ class TaskController extends Controller {
         }
         $taskOptions['input'] = $currentInput;
         $task->update(['options' => $taskOptions]);
-        return redirect()->route('admin.tasks.inputs', [$task->id]);
+        return redirect()->route('admin.tasks.inputs', [$task->id])->withSuccess('The inputs were updated.');;
     }
 
     public function inputAction(Task $task)
@@ -180,7 +180,16 @@ class TaskController extends Controller {
     {
         $questions = [];
         foreach(range(1, 20) as $try)
+        {
+            usleep(100000); //0.1 seconds
             $questions[] = $task->getQuestion(true);
+        }
         return view('admin.tasks.runTests', compact('task', 'questions'));
+    }
+
+    public function updateStatus(Task $task)
+    {
+        $task->update(['status' => request('status')]);
+        return redirect()->route('admin.tasks.final', $task)->withSuccess('The status was changed.');
     }
 }
