@@ -67,12 +67,12 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading">Type</div>
                 </div>
-                @if(request()->has('previous') || ( ! is_null($task)  && ! is_null($task->chained_to)))
-                    @include('admin.tasks.partials.chain')
-                @endif
                 @unless(is_null($task))
                     @include('admin.tasks.partials.preview', ['genOptions' => app()->make(App\Opgaver\TaskRepository\Resolver::class)])
                 @endunless
+                @if(request()->has('previous') || ( ! is_null($task)  && ! is_null($task->chained_to)))
+                    @include('admin.tasks.partials.chain')
+                @endif
                 @yield('sidebar')
             </div>
         </div>

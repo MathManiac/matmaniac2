@@ -25,14 +25,21 @@ class ViewComposer extends ServiceProvider
         });
 
         View::composer('admin.tasks.partials.chain', function($view){
-            $parent = isset($task) ? $parent = $task->previous()->first() : Task::find(request('previous'));
+            /*$task = request()->route('task');
+            $parent = is_null($task) ? Task::find(request('previous')) : $parent = $task->previous()->first();
             $previous = [];
-            $previous[] = $parent->getQuestion(true);
+            $previous[] = $parent;
             while( ! is_null($parent->previous()->first()))
             {
                 dd("LOL");
             }
-            $view->with(compact('previous'));
+            $previous = array_reverse($previous);
+            $questions = [];
+            foreach($previous as $question)
+            {
+                $questions[] = $question->getQuestion(true);
+            }
+            $view->with(compact('questions'));*/
         });
     }
 

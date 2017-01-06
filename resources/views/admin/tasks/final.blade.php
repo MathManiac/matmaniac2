@@ -35,14 +35,28 @@
     <h3><i class="fa fa-link"></i> Chain</h3>
     <div class="row">
         <div class="col-md-4">
-            <h4>Follow Up</h4>
-            <a href="{{ route('admin.tasks.create', [null, 'previous'=>$task->id]) }}" class="btn btn-default btn-block"><i class="fa fa-external-link-square" aria-hidden="true"></i> Create Follow Up Task</a>
+            <h4>New</h4>
+            <a href="{{ route('admin.tasks.create', [null, 'previous'=>$task->id]) }}"
+               class="btn btn-default btn-block"><i class="fa fa-external-link-square" aria-hidden="true"></i> Create
+                Follow Up Task</a>
         </div>
-        <div class="col-md-4">
-            <h4>Previous</h4>
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-8">
             <h4>List</h4>
+            <ul class="list-unstyled">
+                @foreach($task->previousList() as $previousTask)
+                    <li>-
+                        <a href="{{ route('admin.tasks.final', [$previousTask->id]) }}">{{ $previousTask->options['text'] }}</a>
+                    </li>
+                @endforeach
+                <li>-
+                    {{ $task->options['text'] }}
+                </li>
+                @foreach($task->upcoming()->get() as $upcomingTask)
+                        <li style="padding-left:20px">-
+                            <a href="{{ route('admin.tasks.final', [$upcomingTask->id]) }}">{{ $upcomingTask->options['text'] }}</a>
+                        </li>
+                @endforeach
+            </ul>
         </div>
     </div>
 @endsection

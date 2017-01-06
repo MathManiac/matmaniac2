@@ -8,8 +8,9 @@ class Resolver {
 
     public function generateFormula(Task $task)
     {
+        if (session()->has('chain.shared'))
+            extract(session('chain.shared'));
         eval($task->generator);
-
         preg_match_all('#\$[a-zA-Z0-9_]+#', $task->generator, $genVars);
         $genVars = $genVars[0];
         array_walk($genVars, function (&$value, $key)
@@ -52,6 +53,8 @@ class Resolver {
         {
             $value = '$answer' . studly_case($value);
         });
+        if (session()->has('chain.shared'))
+            extract(session('chain.shared'));
         if (session()->has('generatorVars'))
             extract(session('generatorVars'));
         else
@@ -69,6 +72,12 @@ class Resolver {
     public function getGeneratorVariables(Task $task)
     {
         preg_match_all('#\$[a-zA-Z0-9_]+#', $task->options['value'], $variables);
+        return $variables[0];
+    }
+
+    public function getValidatorVariables(Task $task)
+    {
+        preg_match_all('#\$answer[A-Za-z0-9]+#', $task->validator, $variables);
 
         return $variables[0];
     }
@@ -112,7 +121,6 @@ class Resolver {
         {
             $value = '$answer' . studly_case($value);
         });
-
         return count(array_diff($requiredVariables, $answered)) == 0;
     }
     
@@ -129,11 +137,16 @@ class Resolver {
             $var = substr($variable, 1);
             $vNumbers[$variable] = $$var;
         }
-
+        foreach ($this->getValidatorVariables($task) as $variable)
+        {
+            $var = substr($variable, 1);
+            $answerNumbers[$variable] = $$var;
+        }
+        //$sharedVariables = array_merge($vNumbers, $answerNumbers);
+        //session()->flash('shared', $sharedVariables);
         $question['value'] = strtr($task->options['value'], $vNumbers);
         foreach($task->options['input'] as $input)
         {
-
             if($withResults)
             {
                 $answer = 'answer' . studly_case($input['name']);
@@ -142,5 +155,20 @@ class Resolver {
             $question['input'][] = $input;
         }
         return $question;
+    }
+
+    public function chain(Task $task, $withCurrent = false)
+    {
+        $parents = [];
+        if($withCurrent)
+            $parents[] = $task;
+        $parent = $task->previous()->first();
+        while($parent != null)
+        {
+            $parents[] = $parent;
+            $parent = $parent->previous()->first();
+        }
+        $parents = array_reverse($parents);
+        return $parents;
     }
 }

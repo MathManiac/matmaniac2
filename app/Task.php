@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     protected $fillable = [
-        'generator', 'validator', 'status', 'options', 'sub_exercise_id'
+        'generator', 'validator', 'status', 'options', 'sub_exercise_id', 'chained_to'
     ];
 
     protected $casts = [
@@ -30,5 +30,16 @@ class Task extends Model
     public function previous()
     {
         return $this->belongsTo(Task::class, 'chained_to');
+    }
+
+    public function upcoming()
+    {
+        return $this->hasMany(Task::class, 'chained_to');
+    }
+
+    public function previousList()
+    {
+        $taskResolver = app()->make(Resolver::class);
+        return $taskResolver->chain($this);
     }
 }
