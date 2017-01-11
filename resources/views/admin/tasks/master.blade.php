@@ -6,6 +6,19 @@
             <div class="col-md-8">
                 <div class="row">
                     <div class="col-md-12">
+                        <ol class="breadcrumb" style="margin:0px;">
+                            <li><a href="#">{{ ucfirst($breadcrumbs['category']->name) }}</a></li>
+                            <li><a href="{{ route('admin.tasks.list', $breadcrumbs['subCategory']->id) }}">{{ ucfirst($breadcrumbs['subCategory']->name) }}</a></li>
+                            @if(is_null($task))
+                                <li class="active">New Task</li>
+                            @else
+                                <li class="active">{{ $task->options['text'] }}</li>
+                            @endif
+                        </ol>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         @if(is_null($task))
                             @yield('generatorContent', '<h2><a href="'.route('admin.tasks.create', is_null($task) ? [] : $task->id).'">Generator</a></h2>')
                         @else
@@ -64,11 +77,8 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">Type</div>
-                </div>
                 @unless(is_null($task))
-                    @include('admin.tasks.partials.preview', ['genOptions' => app()->make(App\Opgaver\TaskRepository\Resolver::class)])
+                    @include('admin.tasks.partials.preview')
                 @endunless
                 @if(request()->has('previous') || ( ! is_null($task)  && ! is_null($task->chained_to)))
                     @include('admin.tasks.partials.chain')

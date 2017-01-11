@@ -42,4 +42,9 @@ class Task extends Model
         $taskResolver = app()->make(Resolver::class);
         return $taskResolver->chain($this);
     }
+
+    public function SubExerciseType()
+    {
+        return $this->belongsTo(SubExerciseType::class, 'sub_exercise_id');
+    }
 }

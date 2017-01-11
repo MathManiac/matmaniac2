@@ -10,6 +10,8 @@
             <a href="{{ route('admin.tasks.runTests', [$task->id]) }}" class="btn btn-primary"><i class="fa fa-flask"
                                                                                                   aria-hidden="true"></i>
                 Run Test</a>
+
+            <a class="btn btn-danger"><i class="fa fa-trash"></i> Delete Task</a>
         </div>
         <div class="col-md-4">
             <form method="post">
@@ -52,9 +54,9 @@
                     {{ $task->options['text'] }}
                 </li>
                 @foreach($task->upcoming()->get() as $upcomingTask)
-                        <li style="padding-left:20px">-
-                            <a href="{{ route('admin.tasks.final', [$upcomingTask->id]) }}">{{ $upcomingTask->options['text'] }}</a>
-                        </li>
+                    <li style="padding-left:20px">-
+                        <a href="{{ route('admin.tasks.final', [$upcomingTask->id]) }}">{{ $upcomingTask->options['text'] }}</a>
+                    </li>
                 @endforeach
             </ul>
         </div>

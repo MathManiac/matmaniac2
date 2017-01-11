@@ -49,17 +49,22 @@ class ChainMiddleware
             foreach($task->options['input'] as $input)
             {
                 $answer = 'answer' . studly_case($input['name']);
-                $input['answer'] = round($$answer, 2);
+                if(is_numeric($$answer))
+                    $input['answer'] = round($$answer, 2);
+                else
+                    $input['answer'] = $$answer;
                 $chainList[$task->id]['input'][] = $input;
             }
             $vNumbers = [];
-            foreach($genVars as $replacement)
+
+            foreach($sharedVariables as $var => $replacement)
             {
-                $var = substr($replacement, 1);
-                $vNumbers[$replacement] = $$var;
+                if(is_numeric($replacement))
+                    $replacement = round($replacement, 2);
+                $vNumbers['$'.$var] = $replacement;
             }
             $chainList[$task->id]['value'] = strtr($task->options['value'], $vNumbers);
-            $chainList[$task->id]['name'] = $task->options['text'];
+            $chainList[$task->id]['name'] = strtr($task->options['text'], $vNumbers);
         }
         session()->flash('chain.list', $chainList);
         session()->flash('chain.shared', $sharedVariables);

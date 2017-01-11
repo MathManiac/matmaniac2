@@ -10,4 +10,9 @@ class SubExerciseType extends Model
     {
         return $this->belongsTo(ExerciseType::class);
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'sub_exercise_id');
+    }
 }

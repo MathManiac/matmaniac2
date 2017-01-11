@@ -22,7 +22,6 @@ class Resolver {
         {
             $definedVars[$var] = $$var;
         }
-        session()->flash('generatorVars', $definedVars);
         $numbers = [];
         $vNumbers = [];
         $options = $task->options;
@@ -40,9 +39,17 @@ class Resolver {
         }
         if (count($undefined))
             session()->flash('warning', 'The variable(s) ' . implode(', ', $undefined) . ' haven\'t been defined.');
+        if (session()->has('chain.shared'))
+        {
+            $sharedVariables = session('chain.shared');
+            $merge = [];
+            foreach($sharedVariables as $variable => $content)
+                $merge['$'.$variable] = round($content, 2);
+            $vNumbers = array_merge($merge, $vNumbers);
+        }
         $options['numbers'] = $numbers;
         $options['value'] = strtr($options['value'], $vNumbers);
-
+        $options['text'] = strtr($options['text'], $vNumbers);
         return $options;
     }
 
@@ -64,7 +71,9 @@ class Resolver {
         if (isset($$askFor))
         {
             \Debugbar::addMessage($name . ': ' . $$askFor, 'Resultat');
-            return round($$askFor, 2);
+            if(is_numeric($$askFor))
+                $$askFor = round($$askFor, 2);
+            return $$askFor;
         }
         return '';
     }
@@ -127,7 +136,6 @@ class Resolver {
     public function generateQuestion($task, $withResults = false)
     {
         $question = [];
-        //$requiredVariables = $this->getInputVariables($task);
         eval($task->generator);
         eval($task->validator);
         $question['name'] = $task->options['text'];
@@ -142,8 +150,6 @@ class Resolver {
             $var = substr($variable, 1);
             $answerNumbers[$variable] = $$var;
         }
-        //$sharedVariables = array_merge($vNumbers, $answerNumbers);
-        //session()->flash('shared', $sharedVariables);
         $question['value'] = strtr($task->options['value'], $vNumbers);
         foreach($task->options['input'] as $input)
         {

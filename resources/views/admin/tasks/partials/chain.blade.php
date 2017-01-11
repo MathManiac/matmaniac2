@@ -4,22 +4,31 @@
     <div class="panel-body">
         @foreach(session('chain.list') as $id => $chainItem)
             <p>
-                <i class="fa fa-question-circle"></i> <b><a href="{{ route('admin.tasks.final', $id) }}">{{ $chainItem['name'] }}</a></b>
-                $${{ $chainItem['value'] }}$$
+                <i class="fa fa-question-circle"></i> <b><a
+                            href="{{ route('admin.tasks.final', $id) }}">{{ $chainItem['name'] }}</a></b>
+                @if($chainItem['value'] != '')
+                    $${{ $chainItem['value'] }}$$
+                @endif
             </p>
             @foreach($chainItem['input'] as $input)
                 <div class="form-group">
                     <label class="control-label">{{ $input['text'] }}</label>
                     @if($input['type'] == 'text')
                         @if($input['format'] == 'decimal')
-                            <input type="text" value="{{ $input['answer'] }}" readonly class="form-control">
+                            <input type="text" value="{{ round($input['answer'], 2) }}" class="form-control">
                             <p class="text-info">Up to Two Decimal Places</p>
                         @else
                             <div class="input-group">
-                                <input type="text" value="{{ $input['answer'] }}" readonly class="form-control">
+                                <input type="text" value="{{ round($input['answer'], 2) }}" class="form-control">
                                 <div class="input-group-addon">%</div>
                             </div>
                         @endif
+                    @elseif($input['type'] == 'select')
+                        <select class="form-control">
+                            @foreach($input['options'] as $option)
+                                <option @if($input['answer'] == $option['name']) selected @endif>{{ $option['value'] }}</option>
+                            @endforeach
+                        </select>
                     @endif
                 </div>
             @endforeach
@@ -42,7 +51,11 @@
                 <dl class="dl-horizontal">
                     @foreach(session('chain.shared') as $variable => $content)
                         <dt>${{ $variable }}</dt>
-                        <dd>{{ $content }}</dd>
+                        @if(is_numeric($content))
+                            <dd>{{ round($content, 2) }}</dd>
+                        @else
+                            <dd>{{ $content }}</dd>
+                        @endif
                     @endforeach
                 </dl>
             </div>

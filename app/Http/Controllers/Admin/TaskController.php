@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Opgaver\TaskRepository\Resolver;
 use App\Opgaver\TaskResolver;
+use App\SubExerciseType;
 use App\Task;
 use Illuminate\Http\Request;
 
@@ -56,8 +57,23 @@ class TaskController extends Controller {
         return $code;
     }
 
+    public function list($subExercise = null)
+    {
+        $this->levels = [];
+        $subExercise = SubExerciseType::find($subExercise);
+        $exerciseType = $subExercise->exerciseType()->first();
+        $subExercises = $exerciseType->subExercises()->with('tasks')->orderBy('name')->get();
+        $tasks = Task::whereChainedTo(null)->whereSubExerciseId($subExercise->id)->get();
+        foreach($tasks as $task)
+            $this->getLevels($task);
+        $listOfTasks = $this->levels;
+        return view('admin.tasks.list', compact('listOfTasks', 'subExercises', 'subExercise', 'exerciseType'));
+    }
+
     public function create($task = null)
     {
+        if(is_null($task) && ! (request()->has('new-category') || request()->has('previous')))
+            return redirect()->back();
         return view('admin.tasks.create', compact('task', 'genOptions'));
     }
 
@@ -122,8 +138,24 @@ class TaskController extends Controller {
             'text'   => request('new.text'),
             'name'   => request('new.name')
         ];
+        if (request('new.type') == 'select')
+            $newInput['options'] = [];
         $currentInput[] = $newInput;
         $taskOptions['input'] = $currentInput;
+        $task->update(['options' => $taskOptions]);
+
+        return redirect()->route('admin.tasks.inputs', [$task->id]);
+    }
+
+    public function addInputSelection(Task $task)
+    {
+        $inputNumber = request('input');
+        $taskOptions = $task->options;
+        $option = [
+            'name'  => '',
+            'value' => ''
+        ];
+        $taskOptions['input'][$inputNumber]['options'][] = $option;
         $task->update(['options' => $taskOptions]);
 
         return redirect()->route('admin.tasks.inputs', [$task->id]);
@@ -138,7 +170,17 @@ class TaskController extends Controller {
         {
             $currentInput[$i]['text'] = $newInput[$i]['text'];
             $currentInput[$i]['name'] = $newInput[$i]['name'];
-            $currentInput[$i]['format'] = $newInput[$i]['format'];
+            if ($currentInput[$i]['type'] == 'text')
+                $currentInput[$i]['format'] = $newInput[$i]['format'];
+            elseif ($currentInput[$i]['type'] == 'select')
+            {
+                //Update options
+                for ($k = 0; $k < count($newInput[$i]['options']); $k ++)
+                {
+                    $currentInput[$i]['options'][$k]['name'] = $newInput[$i]['options'][$k]['name'];
+                    $currentInput[$i]['options'][$k]['value'] = $newInput[$i]['options'][$k]['value'];
+                }
+            }
         }
         $taskOptions['input'] = $currentInput;
         $task->update(['options' => $taskOptions]);
@@ -229,5 +271,21 @@ class TaskController extends Controller {
         $task->update(['status' => request('status')]);
 
         return redirect()->route('admin.tasks.final', $task)->withSuccess('The status was changed.');
+    }
+
+    private $levels = [];
+
+    private function getLevels(Task $task, $level = 0)
+    {
+        if (is_null($task))
+            return;
+        $taskLevel = [
+            'level' => $level,
+            'task' => $task
+        ];
+        $this->levels[] = $taskLevel;
+        foreach($task->upcoming()->get() as $upComingTask)
+            $this->getLevels($upComingTask, $level+1);
+        return;
     }
 }

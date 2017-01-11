@@ -77,6 +77,15 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
 
     Route::group(['prefix' => 'tasks', 'as' => 'tasks.'], function ()
     {
+        Route::get('list/{subExercise}', [
+            'as'   => 'list',
+            'uses' => 'TaskController@list'
+        ]);
+
+        Route::post('list/create-sub-category', [
+            'as' => 'create-sub-category',
+            'uses' => 'TaskController@createSubCategory'
+        ]);
 
         Route::get('create/{task?}', [
             'as'   => 'create',
@@ -113,6 +122,11 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
             'uses' => 'TaskController@inputAction'
         ]);
 
+        Route::get('{task}/inputs/add-selection', [
+            'as'   => 'addInputSelection',
+            'uses' => 'TaskController@addInputSelection'
+        ]);
+
         Route::get('{task}/validation', [
             'as'   => 'validation',
             'uses' => 'TaskController@validation'
@@ -134,7 +148,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
         ]);
 
         Route::post('{task}/final', [
-            'as' => 'changeStatus',
+            'as'   => 'changeStatus',
             'uses' => 'TaskController@updateStatus'
         ]);
     });

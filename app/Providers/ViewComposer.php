@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Opgaver\TaskRepository\Resolver;
 use App\Opgaver\TaskResolver;
+use App\SubExerciseType;
 use App\Task;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
@@ -24,22 +26,25 @@ class ViewComposer extends ServiceProvider
             $view->with(compact('currentCategory', 'currentSubject'));
         });
 
-        View::composer('admin.tasks.partials.chain', function($view){
-            /*$task = request()->route('task');
-            $parent = is_null($task) ? Task::find(request('previous')) : $parent = $task->previous()->first();
-            $previous = [];
-            $previous[] = $parent;
-            while( ! is_null($parent->previous()->first()))
-            {
-                dd("LOL");
-            }
-            $previous = array_reverse($previous);
-            $questions = [];
-            foreach($previous as $question)
-            {
-                $questions[] = $question->getQuestion(true);
-            }
-            $view->with(compact('questions'));*/
+        View::composer('admin.tasks.partials.preview', function($view){
+            $taskResolver = app(Resolver::class);
+            $task = $view->getData()['task'];
+            $currentTask = $taskResolver->generateFormula($task);
+            $view->with(['preview'=>$currentTask, 'resolver' => $taskResolver]);
+        });
+
+        View::composer('admin.tasks.master', function($view){
+            $task = $view->getData()['task'];
+            $subExercise = request()->has('new-category') ?
+                SubExerciseType::find(request('new-category')) :
+                request()->has('previous') ? Task::find(request('previous'))->subExerciseType()->first() :
+                $task->SubExerciseType()->first();
+            $exercise = $subExercise->exerciseType()->first();
+            $breadcrumbs = [
+                'category' => $exercise,
+                'subCategory' => $subExercise
+            ];
+            $view->with(['breadcrumbs'=>$breadcrumbs]);
         });
     }
 
