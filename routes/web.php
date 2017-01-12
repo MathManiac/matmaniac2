@@ -84,7 +84,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
 
         Route::get('list/{category}/{subcategory?}', [
             'as'   => 'list',
-            'uses' => 'TaskController@list'
+            'uses' => 'TaskController@lists'
         ]);
 
         Route::post('list/{subCategory}/create-sub-category', [
@@ -159,7 +159,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
 
         Route::get('{task}/final', [
             'as'   => 'final',
-            'uses' => 'TaskController@final'
+            'uses' => 'TaskController@end'
         ]);
 
         Route::post('{task}/final', [

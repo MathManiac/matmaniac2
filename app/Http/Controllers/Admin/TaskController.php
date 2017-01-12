@@ -12,11 +12,11 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller {
 
-    private $allowedFunctions = ['rand', 'pow', 'sqrt'];
+    private $allowedFunctions = ['rand', 'pow', 'sqrt', 'while', 'if'];
 
     public function __construct()
     {
-        $this->middleware('admin.chain')->only('create', 'inputs', 'validation', 'final', 'runTests');
+        $this->middleware('admin.chain')->only('create', 'inputs', 'validation', 'end', 'runTests');
     }
 
     private function getForbiddenFunctions($variables)
@@ -70,7 +70,7 @@ class TaskController extends Controller {
         return view('admin.tasks.overview', compact('statistics', 'categories'));
     }
 
-    public function list($exercise, $subExercise = null)
+    public function lists($exercise, $subExercise = null)
     {
         $exerciseType = ExerciseType::find($exercise);
         $this->levels = [];
@@ -267,7 +267,7 @@ class TaskController extends Controller {
         return redirect()->route('admin.tasks.validation', $task)->withSuccess('The task was updated.');
     }
 
-    public function final(Task $task)
+    public function end(Task $task)
     {
         return view('admin.tasks.final', compact('task'));
     }

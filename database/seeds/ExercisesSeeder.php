@@ -80,5 +80,15 @@ class ExercisesSeeder extends Seeder {
             'id'   => 999,
             'name' => 'test'
         ]);
+
+        $exercise = \App\ExerciseType::create([
+            'id'   => 5,
+            'name' => 'differentiation',
+        ]);
+
+        $exercise->subExercises()->create([
+            'id'   => 51,
+            'name' => 'diff-power-functions'
+        ]);
     }
 }

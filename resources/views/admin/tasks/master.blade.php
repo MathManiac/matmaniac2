@@ -8,7 +8,7 @@
                     <div class="col-md-12">
                         <ol class="breadcrumb" style="margin:0px;">
                             <li><a href="#">{{ ucfirst($breadcrumbs['category']->name) }}</a></li>
-                            <li><a href="{{ route('admin.tasks.list', $breadcrumbs['subCategory']->id) }}">{{ ucfirst($breadcrumbs['subCategory']->name) }}</a></li>
+                            <li><a href="{{ route('admin.tasks.list', [$breadcrumbs['category']->id, $breadcrumbs['subCategory']->id]) }}">{{ ucfirst($breadcrumbs['subCategory']->name) }}</a></li>
                             @if(is_null($task))
                                 <li class="active">New Task</li>
                             @else
