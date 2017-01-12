@@ -77,14 +77,24 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
 
     Route::group(['prefix' => 'tasks', 'as' => 'tasks.'], function ()
     {
-        Route::get('list/{subExercise}', [
+        Route::get('overview', [
+            'as'   => 'overview',
+            'uses' => 'TaskController@overview'
+        ]);
+
+        Route::get('list/{category}/{subcategory?}', [
             'as'   => 'list',
             'uses' => 'TaskController@list'
         ]);
 
-        Route::post('list/create-sub-category', [
+        Route::post('list/{subCategory}/create-sub-category', [
             'as'   => 'create-sub-category',
             'uses' => 'TaskController@createSubCategory'
+        ]);
+
+        Route::get('download', [
+            'as'   => 'download',
+            'uses' => 'TaskController@download'
         ]);
 
         Route::get('create/{task?}', [

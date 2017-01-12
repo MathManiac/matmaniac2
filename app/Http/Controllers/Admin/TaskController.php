@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\ExerciseType;
 use App\Http\Controllers\Controller;
 use App\Opgaver\TaskRepository\Resolver;
 use App\Opgaver\TaskResolver;
@@ -57,16 +58,31 @@ class TaskController extends Controller {
         return $code;
     }
 
-    public function list($subExercise = null)
+    public function overview()
     {
+        $statistics = [
+            'tasks'          => Task::count(),
+            'sub_categories' => SubExerciseType::count(),
+            'categories' => ExerciseType::count()
+        ];
+        $categories = ExerciseType::orderBy('name')->get();
+
+        return view('admin.tasks.overview', compact('statistics', 'categories'));
+    }
+
+    public function list($exercise, $subExercise = null)
+    {
+        $exerciseType = ExerciseType::find($exercise);
         $this->levels = [];
         $subExercise = SubExerciseType::find($subExercise);
-        $exerciseType = $subExercise->exerciseType()->first();
         $subExercises = $exerciseType->subExercises()->with('tasks')->orderBy('name')->get();
-        $tasks = Task::whereChainedTo(null)->whereSubExerciseId($subExercise->id)->get();
-        foreach ($tasks as $task)
-            $this->getLevels($task);
-        $listOfTasks = $this->levels;
+        if( ! is_null($subExercise))
+        {
+            $tasks = Task::whereChainedTo(null)->whereSubExerciseId($subExercise->id)->get();
+            foreach ($tasks as $task)
+                $this->getLevels($task);
+            $listOfTasks = $this->levels;
+        }
 
         return view('admin.tasks.list', compact('listOfTasks', 'subExercises', 'subExercise', 'exerciseType'));
     }
@@ -262,6 +278,7 @@ class TaskController extends Controller {
         $taskResolver = app()->make(Resolver::class);
         foreach (range(1, 20) as $try)
             $questions[] = $taskResolver->getQuestionAndAnswer($task, true);
+
         return view('admin.tasks.runTests', compact('task', 'questions'));
     }
 
@@ -279,6 +296,7 @@ class TaskController extends Controller {
         $name = $task->name;
         $category = $task->sub_exercise_id;
         $task->status = 'disabled';
+        $task->save();
         $task->delete();
 
         return redirect()->route('admin.tasks.list', [$category])->withSuccess('The task "' . $name . '" was archived.');
@@ -299,5 +317,16 @@ class TaskController extends Controller {
             $this->getLevels($upComingTask, $level + 1);
 
         return;
+    }
+
+    public function createSubCategory($category)
+    {
+        $name = str_replace(' ', '-', strtolower(request('subCategory')));
+        $subCategory = SubExerciseType::create([
+            'name'             => $name,
+            'exercise_type_id' => $category
+        ]);
+
+        return redirect()->route('admin.tasks.list', [$subCategory->id]);
     }
 }

@@ -4,22 +4,35 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <a href="{{ route('admin.tasks.create', [null, 'new-category'=>$subExercise->id]) }}"
-                   class="btn btn-primary btn-block"><i class="fa fa-plus" aria-hidden="true"></i> Create Task</a>
+
+                <a href="{{ route('admin.tasks.overview') }}" class="btn btn-warning btn-block"><i
+                            class="fa fa-chevron-left"></i> Back to Categories</a>
+                <a data-toggle="modal" data-target="#newCategory" class="btn btn-primary btn-block"><i
+                            class="fa fa-folder-open" aria-hidden="true"></i> New Sub Category</a>
                 <ul class="list-group" style="margin-top:20px;">
                     @foreach($subExercises as $exercise)
-                        <a href="{{ route('admin.tasks.list', [$exercise->id]) }}"
-                           class="list-group-item @if($subExercise->id == $exercise->id) active @endif">
+                        <a href="{{ route('admin.tasks.list', [$exerciseType->id, $exercise->id]) }}"
+                           class="list-group-item @if( ! is_null($subExercise) && $subExercise->id == $exercise->id) active @endif">
                             <span class="badge">{{ count($exercise->tasks) }}</span>
-                            {{ $exercise->name }}
+                            {{ title_case(str_replace('-', ' ', $exercise->name)) }}
                         </a>
                     @endforeach
                 </ul>
-                <a data-toggle="modal" data-target="#newCategory" class="btn btn-primary btn-block"><i
-                            class="fa fa-folder-open" aria-hidden="true"></i> New Sub Category</a>
-                <a class="btn btn-warning btn-block"><i class="fa fa-chevron-left"></i> Back to Categories</a>
+                @if( ! is_null($subExercise))
+                    <a href="{{ route('admin.tasks.create', [null, 'new-category'=>$subExercise->id]) }}"
+                       class="btn btn-primary btn-block"><i class="fa fa-plus" aria-hidden="true"></i> Create Task</a>
+                    <a class="btn btn-default btn-block"><i class="fa fa-download"></i> Import Tasks</a>
+                @endif
             </div>
             <div class="col-md-9">
+                @if( ! is_null($subExercise))
+                    <div class="btn-group">
+                        <a class="btn btn-xs btn-success"><i class="fa fa-arrow-circle-down"></i> Download Tasks</a>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <a class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete Category</a>
+                    </div>
+                @endif
                 <table class="table">
                     <thead>
                     <tr>
@@ -28,14 +41,16 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($listOfTasks as $task)
-                        <tr>
-                            <td><a href="{{ route('admin.tasks.final', [$task['task']->id]) }}"
-                                   style="margin-left: {{ $task['level'] * 20 }}px;">{{ $task['task']->name }}</a>
-                            </td>
-                            <td>{{ ucfirst($task['task']->status) }}</td>
-                        </tr>
-                    @endforeach
+                    @if( ! is_null($subExercise))
+                        @foreach($listOfTasks as $task)
+                            <tr>
+                                <td><a href="{{ route('admin.tasks.final', [$task['task']->id]) }}"
+                                       style="margin-left: {{ $task['level'] * 20 }}px;">{{ $task['task']->name }}</a>
+                                </td>
+                                <td>{{ ucfirst($task['task']->status) }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
                     </tbody>
                 </table>
             </div>
@@ -45,7 +60,9 @@
     <!-- Modal -->
     <div class="modal" id="newCategory" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-sm" role="document">
-            <form action="{{ route('admin.tasks.create-sub-category') }}" class="modal-content" method="post">
+            <form action="{{ route('admin.tasks.create-sub-category', $exerciseType->id) }}" class="modal-content"
+                  method="post">
+                {!! csrf_field() !!}
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
@@ -55,7 +72,8 @@
                     <div>
                         <div class="form-group">
                             <label for="exampleInputEmail1">Name</label>
-                            <input type="text" name="subCategory" class="form-control" id="exampleInputEmail1" placeholder="Email">
+                            <input type="text" name="subCategory" class="form-control" id="exampleInputEmail1"
+                                   placeholder="Name">
                         </div>
                     </div>
                 </div>
