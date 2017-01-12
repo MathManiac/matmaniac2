@@ -15,7 +15,7 @@ class TaskController extends Controller {
 
     public function __construct()
     {
-        $this->middleware('admin.chain')->only('create', 'inputs', 'validation', 'final');
+        $this->middleware('admin.chain')->only('create', 'inputs', 'validation', 'final', 'runTests');
     }
 
     private function getForbiddenFunctions($variables)
@@ -64,16 +64,18 @@ class TaskController extends Controller {
         $exerciseType = $subExercise->exerciseType()->first();
         $subExercises = $exerciseType->subExercises()->with('tasks')->orderBy('name')->get();
         $tasks = Task::whereChainedTo(null)->whereSubExerciseId($subExercise->id)->get();
-        foreach($tasks as $task)
+        foreach ($tasks as $task)
             $this->getLevels($task);
         $listOfTasks = $this->levels;
+
         return view('admin.tasks.list', compact('listOfTasks', 'subExercises', 'subExercise', 'exerciseType'));
     }
 
     public function create($task = null)
     {
-        if(is_null($task) && ! (request()->has('new-category') || request()->has('previous')))
+        if (is_null($task) && ! (request()->has('new-category') || request()->has('previous')))
             return redirect()->back();
+
         return view('admin.tasks.create', compact('task', 'genOptions'));
     }
 
@@ -101,7 +103,7 @@ class TaskController extends Controller {
                     ->withError($codeErrors);
         }
         $options = $task->options;
-        $options['text'] = request('question');
+        $task->name = request('question');
         $options['value'] = request('math-question');
         if ( ! array_key_exists('input', $options))
             $options['input'] = [];
@@ -257,12 +259,9 @@ class TaskController extends Controller {
     public function runTests(Task $task)
     {
         $questions = [];
+        $taskResolver = app()->make(Resolver::class);
         foreach (range(1, 20) as $try)
-        {
-            usleep(100000); //0.1 seconds
-            $questions[] = $task->getQuestion(true);
-        }
-
+            $questions[] = $taskResolver->getQuestionAndAnswer($task, true);
         return view('admin.tasks.runTests', compact('task', 'questions'));
     }
 
@@ -273,6 +272,18 @@ class TaskController extends Controller {
         return redirect()->route('admin.tasks.final', $task)->withSuccess('The status was changed.');
     }
 
+    public function archive(Task $task)
+    {
+        if ($task->upcoming()->count())
+            return redirect()->back()->withError('This task cannot be archived before the upcoming chain items have been archived.');
+        $name = $task->name;
+        $category = $task->sub_exercise_id;
+        $task->status = 'disabled';
+        $task->delete();
+
+        return redirect()->route('admin.tasks.list', [$category])->withSuccess('The task "' . $name . '" was archived.');
+    }
+
     private $levels = [];
 
     private function getLevels(Task $task, $level = 0)
@@ -281,11 +292,12 @@ class TaskController extends Controller {
             return;
         $taskLevel = [
             'level' => $level,
-            'task' => $task
+            'task'  => $task
         ];
         $this->levels[] = $taskLevel;
-        foreach($task->upcoming()->get() as $upComingTask)
-            $this->getLevels($upComingTask, $level+1);
+        foreach ($task->upcoming()->get() as $upComingTask)
+            $this->getLevels($upComingTask, $level + 1);
+
         return;
     }
 }

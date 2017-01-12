@@ -28,46 +28,9 @@ class ChainMiddleware
         if(is_null($task->chained_to))
             return $next($request);
         $taskResolver = app()->make(Resolver::class);
-        $chain = $taskResolver->chain($task, false);
-        $chainList = [];
-        $sharedVariables = [];
-        foreach($chain as $task)
-        {
-            $genVars = $taskResolver->getGeneratorVariables($task);
-            $valVars = $taskResolver->getValidatorVariables($task);
-            $variables = array_merge($genVars, $valVars);
-            eval($task->generator);
-            eval($task->validator);
-            $varContext = [];
-            foreach($variables as $variable)
-            {
-                $variable = substr($variable, 1);
-                $varContext[$variable] = $$variable;
-            }
-            $chainList[$task->id]['variables'] = $varContext;
-            $sharedVariables = array_merge($sharedVariables, $varContext);
-            foreach($task->options['input'] as $input)
-            {
-                $answer = 'answer' . studly_case($input['name']);
-                if(is_numeric($$answer))
-                    $input['answer'] = round($$answer, 2);
-                else
-                    $input['answer'] = $$answer;
-                $chainList[$task->id]['input'][] = $input;
-            }
-            $vNumbers = [];
-
-            foreach($sharedVariables as $var => $replacement)
-            {
-                if(is_numeric($replacement))
-                    $replacement = round($replacement, 2);
-                $vNumbers['$'.$var] = $replacement;
-            }
-            $chainList[$task->id]['value'] = strtr($task->options['value'], $vNumbers);
-            $chainList[$task->id]['name'] = strtr($task->options['text'], $vNumbers);
-        }
-        session()->flash('chain.list', $chainList);
-        session()->flash('chain.shared', $sharedVariables);
+        $question = $taskResolver->getQuestionAndAnswer($task, false);
+        session()->flash('chain.list', $question['list']);
+        session()->flash('chain.shared', $question['shared']);
 
         return $next($request);
     }

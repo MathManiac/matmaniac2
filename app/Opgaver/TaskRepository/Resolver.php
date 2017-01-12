@@ -19,9 +19,8 @@ class Resolver {
         });
         $definedVars = [];
         foreach ($genVars as $var)
-        {
             $definedVars[$var] = $$var;
-        }
+        session()->flash('previewVars', $definedVars);
         $numbers = [];
         $vNumbers = [];
         $options = $task->options;
@@ -49,7 +48,7 @@ class Resolver {
         }
         $options['numbers'] = $numbers;
         $options['value'] = strtr($options['value'], $vNumbers);
-        $options['text'] = strtr($options['text'], $vNumbers);
+        $options['text'] = strtr($task->name, $vNumbers);
         return $options;
     }
 
@@ -62,8 +61,8 @@ class Resolver {
         });
         if (session()->has('chain.shared'))
             extract(session('chain.shared'));
-        if (session()->has('generatorVars'))
-            extract(session('generatorVars'));
+        if (session()->has('previewVars'))
+            extract(session('previewVars'));
         else
             eval($task->generator);
         eval($task->validator);
@@ -136,10 +135,11 @@ class Resolver {
     public function generateQuestion($task, $withResults = false)
     {
         $question = [];
+        if (session()->has('chain.shared'))
+            extract(session('chain.shared'));
         eval($task->generator);
         eval($task->validator);
-        $question['name'] = $task->options['text'];
-
+        $question['name'] = $task->name;
         foreach ($this->getGeneratorVariables($task) as $variable)
         {
             $var = substr($variable, 1);
@@ -176,5 +176,47 @@ class Resolver {
         }
         $parents = array_reverse($parents);
         return $parents;
+    }
+
+    public function getQuestionAndAnswer(Task $task, $withCurrent = false)
+    {
+        $chain = $this->chain($task, $withCurrent);
+        $chainList = [];
+        $sharedVariables = [];
+        foreach($chain as $task)
+        {
+            $genVars = $this->getGeneratorVariables($task);
+            $valVars = $this->getValidatorVariables($task);
+            $variables = array_merge($genVars, $valVars);
+            eval($task->generator);
+            eval($task->validator);
+            $varContext = [];
+            foreach($variables as $variable)
+            {
+                $variable = substr($variable, 1);
+                $varContext[$variable] = $$variable;
+            }
+            $chainList[$task->id]['variables'] = $varContext;
+            $sharedVariables = array_merge($sharedVariables, $varContext);
+            foreach($task->options['input'] as $input)
+            {
+                $answer = 'answer' . studly_case($input['name']);
+                if(is_numeric($$answer))
+                    $input['answer'] = round($$answer, 2);
+                else
+                    $input['answer'] = $$answer;
+                $chainList[$task->id]['input'][] = $input;
+            }
+            $vNumbers = [];
+            foreach($sharedVariables as $var => $replacement)
+            {
+                if(is_numeric($replacement))
+                    $replacement = round($replacement, 2);
+                $vNumbers['$'.$var] = $replacement;
+            }
+            $chainList[$task->id]['value'] = strtr($task->options['value'], $vNumbers);
+            $chainList[$task->id]['name'] = strtr($task->name, $vNumbers);
+        }
+        return ['list' => $chainList, 'shared' => $sharedVariables];
     }
 }

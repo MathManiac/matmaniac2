@@ -9,7 +9,7 @@
         @endif
         <div class="form-group">
             <label>Question</label>
-            <input type="text" name="question" value="{{ old('question', is_null($task) ? '' : $task->options['text']) }}"
+            <input type="text" name="question" value="{{ old('question', is_null($task) ? '' : $task->name) }}"
                    class="form-control">
         </div>
         <div class="form-group">

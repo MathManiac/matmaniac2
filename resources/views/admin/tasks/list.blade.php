@@ -31,7 +31,7 @@
                     @foreach($listOfTasks as $task)
                         <tr>
                             <td><a href="{{ route('admin.tasks.final', [$task['task']->id]) }}"
-                                   style="margin-left: {{ $task['level'] * 20 }}px;">{{ $task['task']->options['text'] }}</a>
+                                   style="margin-left: {{ $task['level'] * 20 }}px;">{{ $task['task']->name }}</a>
                             </td>
                             <td>{{ ucfirst($task['task']->status) }}</td>
                         </tr>
@@ -66,4 +66,22 @@
             </form>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    @if(session()->has('success'))
+        <script>swal("Success", "{{ session('success') }}", "success")</script>
+    @endif
+    @if(session()->has('error'))
+        <script>swal("Error", "{{ addslashes(session('error')) }}", "error")</script>
+    @endif
+    @if(session()->has('warning'))
+        <script>swal("Warning", "{!! addslashes(session('warning')) !!}", "warning")</script>
+    @endif
+@endsection
+
+@section('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css ">
 @endsection

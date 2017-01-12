@@ -37,8 +37,8 @@ class ViewComposer extends ServiceProvider
             $task = $view->getData()['task'];
             $subExercise = request()->has('new-category') ?
                 SubExerciseType::find(request('new-category')) :
-                request()->has('previous') ? Task::find(request('previous'))->subExerciseType()->first() :
-                $task->SubExerciseType()->first();
+                (request()->has('previous') ? Task::find(request('previous'))->subExerciseType()->first() :
+                $task->SubExerciseType()->first());
             $exercise = $subExercise->exerciseType()->first();
             $breadcrumbs = [
                 'category' => $exercise,

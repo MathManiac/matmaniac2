@@ -4,9 +4,12 @@ namespace App;
 
 use App\Opgaver\TaskRepository\Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Task extends Model
-{
+class Task extends Model {
+
+    use SoftDeletes;
+
     protected $fillable = [
         'generator', 'validator', 'status', 'options', 'sub_exercise_id', 'chained_to'
     ];
@@ -15,15 +18,19 @@ class Task extends Model
         'options' => 'array'
     ];
 
+    protected $dates = ['deleted_at'];
+
     public function allInputsAnswered()
     {
         $taskResolver = app()->make(Resolver::class);
+
         return $taskResolver->allInputsAnswered($this);
     }
 
     public function getQuestion($withResult = false)
     {
         $taskResolver = app()->make(Resolver::class);
+
         return $taskResolver->generateQuestion($this, $withResult);
     }
 
@@ -40,6 +47,7 @@ class Task extends Model
     public function previousList()
     {
         $taskResolver = app()->make(Resolver::class);
+
         return $taskResolver->chain($this);
     }
 

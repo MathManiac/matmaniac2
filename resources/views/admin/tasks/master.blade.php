@@ -12,7 +12,7 @@
                             @if(is_null($task))
                                 <li class="active">New Task</li>
                             @else
-                                <li class="active">{{ $task->options['text'] }}</li>
+                                <li class="active">{{ $task->name }}</li>
                             @endif
                         </ol>
                     </div>

@@ -83,7 +83,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
         ]);
 
         Route::post('list/create-sub-category', [
-            'as' => 'create-sub-category',
+            'as'   => 'create-sub-category',
             'uses' => 'TaskController@createSubCategory'
         ]);
 
@@ -137,14 +137,19 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'as' => 'admin.'], fu
             'uses' => 'TaskController@saveValidation'
         ]);
 
-        Route::get('{task}/final', [
-            'as'   => 'final',
-            'uses' => 'TaskController@final'
+        Route::get('{task}/archive', [
+            'as'   => 'archive',
+            'uses' => 'TaskController@archive'
         ]);
 
         Route::get('{task}/run-tests', [
             'as'   => 'runTests',
             'uses' => 'TaskController@runTests'
+        ]);
+
+        Route::get('{task}/final', [
+            'as'   => 'final',
+            'uses' => 'TaskController@final'
         ]);
 
         Route::post('{task}/final', [
