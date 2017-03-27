@@ -15,8 +15,12 @@ return [
         'equation-x-on-both-sides' => 'x på begge sider',
         'equation-x-with-brackets' => 'x i parentes',
         'equation-x-in-nominator' => 'x i tælleren',
+        'equation-x-in-nominator-and-coeff' => 'x i tælleren samt koefficient',
+        'equation-x-in-denominator' => 'x i nævneren',
+        'equation-x-in-denominator-and-coeff' => 'x i nævneren samt koefficient',
         'second-poly' => 'Andengradspolynomium',
-        'two-points-exponential' => 'To punkter, eksponentiel'
+        'two-points-exponential' => 'To punkter, eksponentiel',
+        'two-points-potens' => 'To punkter, potens'
     ],
     'expressions' => [
         'increasing' => 'voksende',

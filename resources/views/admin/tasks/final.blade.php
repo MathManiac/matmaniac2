@@ -40,8 +40,9 @@
         <div class="col-md-4">
             <h4>New</h4>
             <a href="{{ route('admin.tasks.create', [null, 'previous'=>$task->id]) }}"
-               class="btn btn-default btn-block"><i class="fa fa-external-link-square" aria-hidden="true"></i> Create
+               class="btn btn-default btn-block"><i class="fa fa-external-link-square" aria-hidden="true"></i>
                 Follow Up Task</a>
+            <a href="{{ route('admin.tasks.create', [null, 'previous'=>$task->id, 'conditional'=>true]) }}" class="btn btn-default btn-block"><i class="fa fa-question-circle"></i> Conditional Follow Up Task</a>
         </div>
         <div class="col-md-8">
             <h4>List</h4>

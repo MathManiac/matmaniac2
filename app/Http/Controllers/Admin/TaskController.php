@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller {
 
-    private $allowedFunctions = ['rand', 'pow', 'sqrt', 'while', 'if'];
+    private $allowedFunctions = ['rand', 'pow', 'sqrt', 'while', 'if', 'elseif', 'round', 'log', 'array', 'in_array'];
 
     public function __construct()
     {
@@ -100,8 +100,12 @@ class TaskController extends Controller {
         if (is_null($task))
         {
             $task = new Task();
-            if (request()->has('previous'))
+            if (request()->has('previous')) {
                 $task->chained_to = request('previous');
+                $task->sub_exercise_id = Task::find($task->chained_to)->sub_exercise_id;
+            }
+            else
+                $task->sub_exercise_id = request('new-category');
             $task->options = [];
         }
         $forbiddenFunctions = $this->getForbiddenFunctions(request('variables'));
@@ -118,6 +122,25 @@ class TaskController extends Controller {
                     ->withInput()
                     ->withError($codeErrors);
         }
+
+        #region Conditional
+        if(request()->has('condition') || ! is_null($task->chain_condition)) {
+            $cForbiddenFunctions = $this->getForbiddenFunctions(request('condition'));
+            if (count($cForbiddenFunctions) > 0)
+                return redirect()->route('admin.tasks.create', $task)
+                    ->withInput()
+                    ->withError('The following functions are not allowed: ' . implode(', ', $cForbiddenFunctions));
+
+            if (request('condition') != '') {
+                $codeErrors = $this->getErrors(request('condition'), $task);
+                if ($codeErrors != "")
+                    return redirect()->route('admin.tasks.create', $task)
+                        ->withInput()
+                        ->withError($codeErrors);
+            }
+            $task->chain_condition = request('condition');
+        }
+        #endregion
         $options = $task->options;
         $task->name = request('question');
         $options['value'] = request('math-question');
@@ -126,7 +149,6 @@ class TaskController extends Controller {
         $task->generator = request('variables');
         $task->options = $options;
         $task->status = 'unfinished';
-        $task->sub_exercise_id = 999;
         if (is_null($task->validator))
             $task->validator = '';
         $task->save();

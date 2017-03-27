@@ -3,12 +3,22 @@
 @section('generatorContent')
     <h2>Generator</h2>
     <form method="post">
+        @if(request()->has('new-category'))
+            <input type="hidden" name="new-category" value="{{ request('new-category') }}">
+        @endif
         {!! csrf_field() !!}
         @if(request()->has('previous'))
             <input type="hidden" name="previous" value="{{ request('previous') }}">
         @endif
+        @if(request()->has('conditional') || ! is_null($task) && ! is_null($task->chain_condition))
+            <div class="form-group">
+                <label>Condition</label>
+                <textarea name="condition" id="condition" style="width:100%">{{ old('condition', is_null($task) ? '' : $task->chain_condition) }}</textarea>
+                <p class="text-info">The variable <b>$condition</b> must be true for this question to follow up.</p>
+            </div>
+        @endif
         <div class="form-group">
-            <label>Question</label>
+            <label>Header</label>
             <input type="text" name="question" value="{{ old('question', is_null($task) ? '' : $task->name) }}"
                    class="form-control">
         </div>
@@ -39,5 +49,13 @@
             start_highlight: true,
             allow_toggle: false
         });
+        @if(request()->has('conditional'))
+            editAreaLoader.init({
+            id: "condition",
+            syntax: "php",
+            start_highlight: true,
+            allow_toggle: false
+        });
+        @endif
     </script>
 @endsection

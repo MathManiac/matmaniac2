@@ -61,6 +61,21 @@ class ExercisesSeeder extends Seeder {
             'name' => 'equation-x-in-nominator'
         ]);
 
+        $exercise->subExercises()->create([
+            'id'   => 44,
+            'name' => 'equation-x-in-nominator-and-coeff'
+        ]);
+
+        $exercise->subExercises()->create([
+            'id'   => 45,
+            'name' => 'equation-x-in-denominator'
+        ]);
+
+        $exercise->subExercises()->create([
+            'id'   => 46,
+            'name' => 'equation-x-in-denominator-and-coeff'
+        ]);
+
         $exercise = \App\ExerciseType::create([
             'id'   => 4,
             'name' => 'functions',
@@ -69,6 +84,11 @@ class ExercisesSeeder extends Seeder {
         $exercise->subExercises()->create([
             'id'   => 60,
             'name' => 'two-points-exponential'
+        ]);
+
+        $exercise->subExercises()->create([
+            'id'   => 62,
+            'name' => 'two-points-potens'
         ]);
 
         $exercise->subExercises()->create([

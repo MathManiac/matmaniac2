@@ -17,6 +17,7 @@ class CreateTasksTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('sub_exercise_id');
             $table->unsignedInteger('chained_to')->nullable();
+            $table->text('chain_condition')->nullable();
             $table->string('name');
             $table->longText('generator');
             $table->longText('validator');
